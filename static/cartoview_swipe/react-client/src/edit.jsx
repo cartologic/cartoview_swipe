@@ -6,6 +6,7 @@ import { default as WizardSteper } from './components/EditModeNavigator.jsx'
 import { default as ResourceSelector } from './components/ResourceSelector.jsx'
 import { default as General } from './components/General.jsx'
 import { default as MapExtent } from './components/MapExtent.jsx'
+import {default as SelectionsBox} from './components/UserSelections.jsx'
 
 import './css/style.css'
 
@@ -54,6 +55,25 @@ export default class editAppInstance extends React.Component {
       .then(data=> this.setState({savingIndicator: false}))
   }
 
+  getSelections() {
+    let a = []
+    if (this.state.layerLeft) {
+      a.push({
+        title: "Left Layer",
+        layer: this.state.layerLeft
+      })
+    }
+    if (this.state.layerRight) {
+      a.push(
+        {
+          title: "Right Layer",
+          layer: this.state.layerRight
+        }  
+      )
+    }
+    return a
+  }
+
   render() {
     const steps = [
       {
@@ -83,9 +103,8 @@ export default class editAppInstance extends React.Component {
           searchResourcesApiUrl: URLS.searchByTitleApiUrl,
           title: 'Select Left Layer',
           selectedResource: this.state.layerLeft,
-          selectedIndex: this.state.layerLeftIndex,
-          onComplete: (layer, index) => {
-            this.setState({layerLeft: layer, layerLeftIndex: index})
+          onComplete: (layer) => {
+            this.setState({layerLeft: layer})
           },
           stepBack: () => {
             this.goToStep(this.state.step - 1)
@@ -103,9 +122,8 @@ export default class editAppInstance extends React.Component {
           searchResourcesApiUrl: URLS.searchByTitleApiUrl,
           title: 'Select Right Layer',
           selectedResource: this.state.layerRight,
-          selectedIndex: this.state.layerRightIndex,
-          onComplete: (layer, index) => {
-            this.setState({layerRight: layer, layerRightIndex: index})
+          onComplete: (layer) => {
+            this.setState({layerRight: layer})
           },
           stepBack: () => {
             this.goToStep(this.state.step - 1)
@@ -140,6 +158,9 @@ export default class editAppInstance extends React.Component {
     const step = this.state.step
     return (
       <div>
+        <SelectionsBox
+          selections={this.getSelections()}  
+        />
         <WizardSteper
           steps={steps}
           step={step}

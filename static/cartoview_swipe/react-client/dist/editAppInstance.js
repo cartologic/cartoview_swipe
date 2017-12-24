@@ -22092,7 +22092,6 @@ var ResourceSelector = function (_React$Component) {
         forcePage: 0,
 
         searchValue: '',
-        selectedResourceIndex: this.props.selectedIndex,
         selectedResource: this.props.selectedResource,
 
         limit: 50,
@@ -22158,7 +22157,7 @@ var ResourceSelector = function (_React$Component) {
                 display: "inline-block",
                 margin: "0px 3px 0px 3px"
               },
-              className: this.state.selectedResource !== "" ? "btn btn-primary btn-sm pull-right" : "btn btn-primary btn-sm pull-right disabled",
+              className: this.state.selectedResource !== undefined ? "btn btn-primary btn-sm pull-right" : "btn btn-primary btn-sm pull-right disabled",
               onClick: this.onNext.bind(this) },
             "next >>"
           ),
@@ -22244,9 +22243,9 @@ var ResourceSelector = function (_React$Component) {
               key: i,
               className: 'list-group-item',
               onClick: function onClick() {
-                _this8.setState({ selectedResource: resource.typename });
+                _this8.setState({ selectedResource: resource });
               },
-              style: _this8.state.selectedResource === resource.typename ? {
+              style: _this8.state.selectedResource && _this8.state.selectedResource.typename === resource.typename ? {
                 boxShadow: "0px 0px 10px 5px steelblue",
                 paddingTop: "0px",
                 paddingBottom: '0px',
@@ -27300,7 +27299,7 @@ exports = module.exports = __webpack_require__(60)(undefined);
 
 
 // module
-exports.push([module.i, ".loading{\n  border-radius: 100%;\n  border: 3px solid rgba(0, 0, 0, .1);\n  border-top-color: rgba(0, 0, 0, .45);\n  box-sizing: border-box;\n  height: 30px;\n  width: 30px;\n  -webkit-animation:spin .7s linear infinite;\n  animation:spin 2s linear infinite;\n}\n\n.center-pagination {\n  display: flex;\n  justify-content: center;\n}", ""]);
+exports.push([module.i, ".loading{\n  border-radius: 100%;\n  border: 3px solid rgba(0, 0, 0, .1);\n  border-top-color: rgba(0, 0, 0, .45);\n  box-sizing: border-box;\n  height: 30px;\n  width: 30px;\n  -webkit-animation:spin .7s linear infinite;\n  animation:spin 2s linear infinite;\n}\n\n.center-pagination {\n  display: flex;\n  justify-content: center;\n}\n\n.selections-box{\n  display: flex;\n  justify-content: space-around;\n  align-items: center;\n  padding: 25px 5px;\n  margin-bottom: 25px;\n  font-weight: bolder;\n  border-top: 1px solid lightgrey;\n  border-bottom: 1px solid lightgrey;\n}", ""]);
 
 // exports
 
@@ -27349,6 +27348,10 @@ var _General2 = _interopRequireDefault(_General);
 var _MapExtent = __webpack_require__(123);
 
 var _MapExtent2 = _interopRequireDefault(_MapExtent);
+
+var _UserSelections = __webpack_require__(131);
+
+var _UserSelections2 = _interopRequireDefault(_UserSelections);
 
 __webpack_require__(124);
 
@@ -27426,6 +27429,24 @@ var editAppInstance = function (_React$Component) {
       });
     }
   }, {
+    key: 'getSelections',
+    value: function getSelections() {
+      var a = [];
+      if (this.state.layerLeft) {
+        a.push({
+          title: "Left Layer",
+          layer: this.state.layerLeft
+        });
+      }
+      if (this.state.layerRight) {
+        a.push({
+          title: "Right Layer",
+          layer: this.state.layerRight
+        });
+      }
+      return a;
+    }
+  }, {
     key: 'render',
     value: function render() {
       var _this3 = this;
@@ -27456,9 +27477,8 @@ var editAppInstance = function (_React$Component) {
           searchResourcesApiUrl: URLS.searchByTitleApiUrl,
           title: 'Select Left Layer',
           selectedResource: this.state.layerLeft,
-          selectedIndex: this.state.layerLeftIndex,
-          onComplete: function onComplete(layer, index) {
-            _this3.setState({ layerLeft: layer, layerLeftIndex: index });
+          onComplete: function onComplete(layer) {
+            _this3.setState({ layerLeft: layer });
           },
           stepBack: function stepBack() {
             _this3.goToStep(_this3.state.step - 1);
@@ -27475,9 +27495,8 @@ var editAppInstance = function (_React$Component) {
           searchResourcesApiUrl: URLS.searchByTitleApiUrl,
           title: 'Select Right Layer',
           selectedResource: this.state.layerRight,
-          selectedIndex: this.state.layerRightIndex,
-          onComplete: function onComplete(layer, index) {
-            _this3.setState({ layerRight: layer, layerRightIndex: index });
+          onComplete: function onComplete(layer) {
+            _this3.setState({ layerRight: layer });
           },
           stepBack: function stepBack() {
             _this3.goToStep(_this3.state.step - 1);
@@ -27511,6 +27530,9 @@ var editAppInstance = function (_React$Component) {
       return _react2.default.createElement(
         'div',
         null,
+        _react2.default.createElement(_UserSelections2.default, {
+          selections: this.getSelections()
+        }),
         _react2.default.createElement(_EditModeNavigator2.default, {
           steps: steps,
           step: step,
@@ -27633,6 +27655,72 @@ var Navigator = function (_Component) {
 }(_react.Component);
 
 exports.default = Navigator;
+
+/***/ }),
+/* 130 */,
+/* 131 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var UserSelections = function (_Component) {
+  _inherits(UserSelections, _Component);
+
+  function UserSelections() {
+    _classCallCheck(this, UserSelections);
+
+    return _possibleConstructorReturn(this, (UserSelections.__proto__ || Object.getPrototypeOf(UserSelections)).apply(this, arguments));
+  }
+
+  _createClass(UserSelections, [{
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'div',
+        { className: 'selections-box' },
+        this.props.selections.map(function (s, i) {
+          return _react2.default.createElement(
+            'div',
+            { key: i, className: 'selection' },
+            _react2.default.createElement(
+              'span',
+              null,
+              s.title + ': '
+            ),
+            _react2.default.createElement(
+              'a',
+              { href: s.layer.detail_url, target: '_blank' },
+              s.layer.title
+            )
+          );
+        })
+      );
+    }
+  }]);
+
+  return UserSelections;
+}(_react.Component);
+
+exports.default = UserSelections;
 
 /***/ })
 /******/ ]);

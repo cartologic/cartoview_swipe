@@ -26,8 +26,8 @@
     const app_name = "{{app_name}}"
     const app_instance_id = "{{instance.id}}"
     const app_instance_config = {{instance.config | escape | safe}};
-    const layerLeftName = app_instance_config.layerLeft;
-    const layerRightName = app_instance_config.layerRight;
+    const layerLeftName = app_instance_config.layerLeft.typename;
+    const layerRightName = app_instance_config.layerRight.typename;
     const theExtent = app_instance_config.theExtent;
 
   var osm = new ol.layer.Tile({
@@ -59,7 +59,7 @@
   });
 
   var map = new ol.Map({
-    layers: [osm, layerRight, layerLeft, ],
+    layers: [osm, layerLeft, layerRight, ],
     target: 'map',
     controls: ol.control.defaults({
       attributionOptions: {
@@ -76,7 +76,7 @@
 
   var swipe = document.getElementById('swipe');
 
-  layerLeft.on('precompose', function (event) {
+  layerRight.on('precompose', function (event) {
     var ctx = event.context;
     var width = ctx.canvas.width * (swipe.value / 100);
 
@@ -86,7 +86,7 @@
     ctx.clip();
   });
 
-  layerLeft.on('postcompose', function (event) {
+  layerRight.on('postcompose', function (event) {
     var ctx = event.context;
     ctx.restore();
   });

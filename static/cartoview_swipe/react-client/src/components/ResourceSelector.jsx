@@ -76,7 +76,6 @@ export default class ResourceSelector extends React.Component {
       forcePage: 0,
 
       searchValue: '',
-      selectedResourceIndex: this.props.selectedIndex,
       selectedResource: this.props.selectedResource,
 
       limit: 50,
@@ -127,7 +126,7 @@ export default class ResourceSelector extends React.Component {
             margin: "0px 3px 0px 3px"
             }}
             className={
-              this.state.selectedResource !== ""
+              this.state.selectedResource !== undefined
                 ? "btn btn-primary btn-sm pull-right" :
                 "btn btn-primary btn-sm pull-right disabled"
             }
@@ -189,9 +188,9 @@ export default class ResourceSelector extends React.Component {
           <li
             key={i}  
             className="list-group-item"
-            onClick={() => { this.setState({selectedResource: resource.typename }) }}
+            onClick={() => { this.setState({selectedResource: resource }) }}
             style={
-              this.state.selectedResource === resource.typename ?
+              this.state.selectedResource && this.state.selectedResource.typename === resource.typename ?
                 {
                   boxShadow: "0px 0px 10px 5px steelblue",
                   paddingTop: "0px",
