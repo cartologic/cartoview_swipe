@@ -1,0 +1,64 @@
+{% extends "app_manager/app_install_base.html" %} 
+{% load bootstrap_tags staticfiles %} {% load i18n %}
+
+{% block title %} {{app_name}} {% endblock %}
+
+{% block head %} 
+{% include "geonode/ext_header.html" %} 
+{% include "geonode/app_header.html"%} 
+{{ block.super }} 
+{% endblock %}
+
+
+
+{% block body %}
+
+    <br>
+    <br>
+    <div id='reactjs-app'></div>
+
+    <script type="text/javascript">
+        function getCookie(name) {
+          var cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+              var cookie = cookies[i].trim();
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
+        const CSRF_TOKEN = getCookie('csrftoken');
+
+        app_name = "{{app_name}}"
+        site_url = "{{SITEURL}}"
+
+        const URLS = {
+          geoserver: "{{ GEOSERVER_BASE_URL }}",
+          layersApiUrl: "/apps/{{app_name}}/api/layers/?limit=50&offset=0",
+          searchByTitleApiUrl: "/apps/{{app_name}}/api/layers/?typename=",
+          new: "/apps/{{app_name}}/new/",
+        };
+        
+        {% if request.user.is_authenticated %}
+        const user_logged_in = true
+        const username = '{{request.user}}'
+        {% else %}
+        const user_logged_in = false
+        const username = undefined
+        {% endif %}
+      </script>
+
+    {% static "" as staticUrl %}
+    <script src='{{staticUrl}}{{app_name}}/react-client/dist/newAppInstance.js'></script>
+    <script type="text/javascript">
+        const props = {}
+        var app = React.createElement(newAppInstance, props);
+        ReactDOM.render(app, document.getElementById("reactjs-app"));
+    </script>
+{% endblock %}

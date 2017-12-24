@@ -1,0 +1,15 @@
+.loading{
+  border-radius: 100%;
+  border: 3px solid rgba(0, 0, 0, .1);
+  border-top-color: rgba(0, 0, 0, .45);
+  box-sizing: border-box;
+  height: 30px;
+  width: 30px;
+  -webkit-animation:spin .7s linear infinite;
+  animation:spin 2s linear infinite;
+}
+
+.center-div {
+  margin-right: auto;
+  margin-left: auto
+}

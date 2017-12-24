@@ -1,0 +1,98 @@
+{% extends "app_manager/app_install_base.html" %} 
+{% load bootstrap_tags staticfiles %} {% load i18n %}
+
+{% block title %} {{app_name}} {% endblock %}
+
+{% block head %} 
+{% include "geonode/ext_header.html" %} 
+{% include "geonode/app_header.html"%} 
+
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.4/css/ol.css" type="text/css">
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <script src="https://openlayers.org/en/v4.6.4/build/ol.js"></script>
+{{ block.super }} 
+{% endblock %}
+
+
+{% block body %}
+<br>
+<br>
+<div id="map" class="map"></div>
+<input id="swipe" type="range" style="width: 100%">
+
+<script>
+    const site_url = "{{SITEURL}}"
+    const app_name = "{{app_name}}"
+    const app_instance_id = "{{instance.id}}"
+    const app_instance_config = {{instance.config | escape | safe}};
+    const layerLeftName = app_instance_config.layerLeft;
+    const layerRightName = app_instance_config.layerRight;
+    const theExtent = app_instance_config.theExtent;
+
+  var osm = new ol.layer.Tile({
+    source: new ol.source.OSM()
+  });
+
+  var layerRight = new ol.layer.Tile({
+    source: new ol.source.TileWMS({
+      url: "{{GEOSERVER_BASE_URL}}"+'wms',
+      params: {
+        'LAYERS': layerRightName,
+        'TILED': true
+      },
+      serverType: 'geoserver',
+      transition: 0
+    })
+  })
+
+  var layerLeft = new ol.layer.Tile({
+    source: new ol.source.TileWMS({
+      url: "{{GEOSERVER_BASE_URL}}"+'wms',
+      params: {
+        'LAYERS': layerLeftName,
+        'TILED': true
+      },
+      serverType: 'geoserver',
+      transition: 0
+    })
+  });
+
+  var map = new ol.Map({
+    layers: [osm, layerRight, layerLeft, ],
+    target: 'map',
+    controls: ol.control.defaults({
+      attributionOptions: {
+        collapsible: false
+      }
+    }),
+    view: new ol.View({
+      center: [0, 0],
+      zoom: 2
+    })
+  });
+
+  map.getView().fit(theExtent)
+
+  var swipe = document.getElementById('swipe');
+
+  layerLeft.on('precompose', function (event) {
+    var ctx = event.context;
+    var width = ctx.canvas.width * (swipe.value / 100);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(width, 0, ctx.canvas.width - width, ctx.canvas.height);
+    ctx.clip();
+  });
+
+  layerLeft.on('postcompose', function (event) {
+    var ctx = event.context;
+    ctx.restore();
+  });
+
+  swipe.addEventListener('input', function () {
+    map.render();
+  }, false);
+</script>
+{% endblock %}
