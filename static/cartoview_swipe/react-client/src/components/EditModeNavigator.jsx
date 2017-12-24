@@ -14,10 +14,11 @@ export default class Navigator extends Component {
         key={index}
         className={className}
         onClick={e => this.onClick(e, index)}>
-        {
-          <i className="fa fa-check" aria-hidden="true"></i>
-        }
         {label}
+        {
+          this.props.errors.indexOf(index) !== -1 &&
+          <i className="fa fa-exclamation-triangle error-tab" aria-hidden="true"></i>
+        }
       </li>
     )
   }

@@ -119,30 +119,6 @@ export default class ResourceSelector extends React.Component {
         <div className="col-xs-5 col-md-4">
           <h4>{this.props.title}</h4>
         </div>
-        <div className="col-xs-7 col-md-8">
-          <button
-            style={{
-            display: "inline-block",
-            margin: "0px 3px 0px 3px"
-            }}
-            className={
-              this.state.selectedResource !== undefined
-                ? "btn btn-primary btn-sm pull-right" :
-                "btn btn-primary btn-sm pull-right disabled"
-            }
-            onClick={this.onNext.bind(this)}>
-            {"next >>"}
-          </button>
-          <button
-            style={{
-            display: "inline-block",
-            margin: "0px 3px 0px 3px"
-            }}
-            className="btn btn-primary btn-sm pull-right"
-            onClick={this.onPrev.bind(this)}>
-            {"<< Prev"}
-          </button>
-        </div>
       </div>
     )
   }

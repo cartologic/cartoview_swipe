@@ -22146,32 +22146,6 @@ var ResourceSelector = function (_React$Component) {
             null,
             this.props.title
           )
-        ),
-        _react2.default.createElement(
-          'div',
-          { className: 'col-xs-7 col-md-8' },
-          _react2.default.createElement(
-            'button',
-            {
-              style: {
-                display: "inline-block",
-                margin: "0px 3px 0px 3px"
-              },
-              className: this.state.selectedResource !== undefined ? "btn btn-primary btn-sm pull-right" : "btn btn-primary btn-sm pull-right disabled",
-              onClick: this.onNext.bind(this) },
-            "next >>"
-          ),
-          _react2.default.createElement(
-            'button',
-            {
-              style: {
-                display: "inline-block",
-                margin: "0px 3px 0px 3px"
-              },
-              className: 'btn btn-primary btn-sm pull-right',
-              onClick: this.onPrev.bind(this) },
-            "<< Prev"
-          )
         )
       );
     }
@@ -23323,7 +23297,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Access = _tcombForm2.default.enums({
   public: 'Public', private: 'Private (only me)'
 });
-var mapConfig = _tcombForm2.default.struct({ title: _tcombForm2.default.String, abstract: _tcombForm2.default.String, access: Access });
+var formConfig = _tcombForm2.default.struct({ title: _tcombForm2.default.String, abstract: _tcombForm2.default.maybe(_tcombForm2.default.String), access: Access });
 var options = {
   fields: {
     title: {
@@ -23364,11 +23338,25 @@ var General = function (_Component) {
       basicConfig !== null && this.props.stepForward();
     }
   }, {
+    key: 'onChange',
+    value: function onChange(value) {
+      var _this2 = this;
+
+      this.setState({ defaultConfig: value }, function () {
+        _this2.props.onComplete(_this2.state.defaultConfig);
+      });
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate() {
+      if (this.props.error) {
+        this.refs.form.getValue();
+      }
+    }
+  }, {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
-      var basicConfig = this.refs.form.getValue();
-      if (basicConfig === null) return false;
-      this.props.onComplete(basicConfig);
+      this.props.onComplete(this.state.defaultConfig);
     }
   }, {
     key: 'render',
@@ -23387,25 +23375,15 @@ var General = function (_Component) {
               null,
               'General'
             )
-          ),
-          _react2.default.createElement(
-            'div',
-            { className: 'col-xs-7 col-md-8' },
-            _react2.default.createElement(
-              'button',
-              {
-                style: {
-                  display: "inline-block",
-                  margin: "0px 3px 0px 3px"
-                },
-                className: 'btn btn-primary btn-sm pull-right',
-                onClick: this.onNext.bind(this) },
-              "next >>"
-            )
           )
         ),
         _react2.default.createElement('hr', null),
-        _react2.default.createElement(Form, { ref: 'form', value: this.state.defaultConfig, type: mapConfig, options: options })
+        _react2.default.createElement(Form, {
+          ref: 'form',
+          value: this.state.defaultConfig,
+          type: formConfig,
+          options: options,
+          onChange: this.onChange.bind(this) })
       );
     }
   }]);
@@ -27164,7 +27142,12 @@ var MapExtent = function (_React$Component) {
   }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
+      var _this2 = this;
+
       this.serveMap();
+      this.map.on('moveend', function () {
+        _this2.props.onComplete(_this2.map.getView().calculateExtent());
+      });
     }
   }, {
     key: 'componentWillUnmount',
@@ -27174,8 +27157,6 @@ var MapExtent = function (_React$Component) {
   }, {
     key: 'renderHeader',
     value: function renderHeader() {
-      var _this2 = this;
-
       return _react2.default.createElement(
         'div',
         { className: 'row' },
@@ -27187,50 +27168,6 @@ var MapExtent = function (_React$Component) {
             null,
             this.props.title
           )
-        ),
-        _react2.default.createElement(
-          'div',
-          { className: 'col-xs-7 col-md-8' },
-          _react2.default.createElement(
-            'button',
-            {
-              style: {
-                display: "inline-block",
-                margin: "0px 3px 0px 3px"
-              },
-              className: this.props.app_instance_id ? "btn btn-primary btn-sm pull-right" : "btn btn-primary btn-sm pull-right disabled",
-              onClick: function onClick() {
-                return window.location.href = site_url + 'apps/' + app_name + '/' + _this2.props.app_instance_id + '/view';
-              } },
-            "View"
-          ),
-          _react2.default.createElement(
-            'button',
-            {
-              style: {
-                display: "inline-block",
-                margin: "0px 3px 0px 3px"
-              },
-              className: "btn btn-primary btn-sm pull-right",
-              onClick: function onClick() {
-                _this2.props.save(_this2.map.getView().calculateExtent());
-              } },
-            "Save"
-          ),
-          _react2.default.createElement(
-            'button',
-            {
-              style: {
-                display: "inline-block",
-                margin: "0px 3px 0px 3px"
-              },
-              className: 'btn btn-primary btn-sm pull-right',
-              onClick: function onClick() {
-                _this2.props.stepBack();
-              } },
-            "<< Prev"
-          ),
-          this.props.savingIndicator && _react2.default.createElement('div', { className: 'loading' })
         )
       );
     }
@@ -27299,7 +27236,7 @@ exports = module.exports = __webpack_require__(60)(undefined);
 
 
 // module
-exports.push([module.i, ".loading{\n  border-radius: 100%;\n  border: 3px solid rgba(0, 0, 0, .1);\n  border-top-color: rgba(0, 0, 0, .45);\n  box-sizing: border-box;\n  height: 30px;\n  width: 30px;\n  -webkit-animation:spin .7s linear infinite;\n  animation:spin 2s linear infinite;\n}\n\n.center-pagination {\n  display: flex;\n  justify-content: center;\n}\n\n.selections-box{\n  display: flex;\n  justify-content: space-around;\n  align-items: center;\n  padding: 25px 5px;\n  margin-bottom: 25px;\n  font-weight: bolder;\n  border-top: 1px solid lightgrey;\n  border-bottom: 1px solid lightgrey;\n}", ""]);
+exports.push([module.i, ".loading{\n  border-radius: 100%;\n  border: 3px solid rgba(0, 0, 0, .1);\n  border-top-color: rgba(0, 0, 0, .45);\n  box-sizing: border-box;\n  height: 30px;\n  width: 30px;\n  -webkit-animation:spin .7s linear infinite;\n  animation:spin 2s linear infinite;\n}\n\n.center-pagination {\n  display: flex;\n  justify-content: center;\n}\n\n.selections-box{\n  display: flex;\n  justify-content: space-around;\n  align-items: center;\n  margin-bottom: 25px;\n  font-weight: bolder;\n}\n\n.error-tab{\n  float: right;\n  color: darkred;\n  font-size: larger;\n}", ""]);
 
 // exports
 
@@ -27331,9 +27268,9 @@ var _propTypes = __webpack_require__(21);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _Navigator = __webpack_require__(127);
+var _EditModeNavigator = __webpack_require__(129);
 
-var _Navigator2 = _interopRequireDefault(_Navigator);
+var _EditModeNavigator2 = _interopRequireDefault(_EditModeNavigator);
 
 var _ResourceSelector = __webpack_require__(76);
 
@@ -27352,6 +27289,8 @@ var _UserSelections = __webpack_require__(131);
 var _UserSelections2 = _interopRequireDefault(_UserSelections);
 
 __webpack_require__(124);
+
+var _tcombValidation = __webpack_require__(40);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -27377,6 +27316,8 @@ var newAppInstance = function (_React$Component) {
 
     return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = newAppInstance.__proto__ || Object.getPrototypeOf(newAppInstance)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
       step: 0,
+      errors: [],
+
       app_instance_id: undefined,
       // general step default config
       title: "",
@@ -27400,6 +27341,24 @@ var newAppInstance = function (_React$Component) {
       this.setState({ step: step });
     }
   }, {
+    key: 'validateConfig',
+    value: function validateConfig(instanceConfig) {
+      var a = [];
+      if (instanceConfig.title === "") {
+        a.push(0);
+      }
+      if (instanceConfig.config.layerLeft === undefined) {
+        a.push(1);
+      }
+      if (instanceConfig.config.layerRight === undefined) {
+        a.push(2);
+      }
+      this.setState({ errors: a });
+
+      if (a.length === 0) return true;
+      return false;
+    }
+  }, {
     key: 'saveAppInstance',
     value: function saveAppInstance() {
       var _this2 = this;
@@ -27414,17 +27373,21 @@ var newAppInstance = function (_React$Component) {
           theExtent: this.state.theExtent
         }
       };
-      var url = URLS.new;
-      fetch(url, {
-        method: 'POST',
-        credentials: "same-origin",
-        headers: new Headers({ "Content-Type": "application/json; charset=UTF-8", "X-CSRFToken": CSRF_TOKEN }),
-        body: JSON.stringify(instanceConfig)
-      }).then(function (response) {
-        return response.json();
-      }).then(function (data) {
-        return _this2.setState({ app_instance_id: data.id, savingIndicator: false });
-      });
+      if (this.validateConfig(instanceConfig)) {
+        var url = URLS.new;
+        fetch(url, {
+          method: 'POST',
+          credentials: "same-origin",
+          headers: new Headers({ "Content-Type": "application/json; charset=UTF-8", "X-CSRFToken": CSRF_TOKEN }),
+          body: JSON.stringify(instanceConfig)
+        }).then(function (response) {
+          return response.json();
+        }).then(function (data) {
+          return _this2.setState({ app_instance_id: data.id, savingIndicator: false });
+        });
+      } else {
+        this.setState({ savingIndicator: false });
+      }
     }
   }, {
     key: 'getSelections',
@@ -27445,9 +27408,49 @@ var newAppInstance = function (_React$Component) {
       return a;
     }
   }, {
+    key: 'renderHeader',
+    value: function renderHeader() {
+      var _this3 = this;
+
+      return _react2.default.createElement(
+        'div',
+        { className: 'save-view-box' },
+        _react2.default.createElement(
+          'button',
+          {
+            style: {
+              display: "inline-block",
+              margin: "0px 3px 0px 3px"
+            },
+            className: this.state.app_instance_id ? "btn btn-primary btn-sm pull-right" : "btn btn-primary btn-sm pull-right disabled",
+            onClick: function onClick() {
+              return window.location.href = site_url + 'apps/' + app_name + '/' + _this3.state.app_instance_id + '/view';
+            } },
+          "View"
+        ),
+        _react2.default.createElement(
+          'button',
+          {
+            style: {
+              display: "inline-block",
+              margin: "0px 3px 0px 3px"
+            },
+            className: "btn btn-primary btn-sm pull-right",
+            onClick: function onClick() {
+              _this3.saveAppInstance();
+            } },
+          "Save"
+        ),
+        this.state.savingIndicator && _react2.default.createElement('div', { className: 'loading' }),
+        _react2.default.createElement(_UserSelections2.default, {
+          selections: this.getSelections()
+        })
+      );
+    }
+  }, {
     key: 'render',
     value: function render() {
-      var _this3 = this;
+      var _this4 = this;
 
       var steps = [{
         label: "General",
@@ -27457,15 +27460,16 @@ var newAppInstance = function (_React$Component) {
           abstract: this.state.abstract,
           access: this.state.access,
           onComplete: function onComplete(data) {
-            _this3.setState({
+            _this4.setState({
               title: data.title,
               abstract: data.abstract,
               access: data.access
             });
           },
           stepForward: function stepForward() {
-            _this3.goToStep(_this3.state.step + 1);
-          }
+            _this4.goToStep(_this4.state.step + 1);
+          },
+          error: this.state.errors.indexOf(0) !== -1
         }
       }, {
         label: "Select Left Layer",
@@ -27476,13 +27480,13 @@ var newAppInstance = function (_React$Component) {
           title: 'Select Left Layer',
           selectedResource: this.state.layerLeft,
           onComplete: function onComplete(layer) {
-            _this3.setState({ layerLeft: layer });
+            _this4.setState({ layerLeft: layer });
           },
           stepBack: function stepBack() {
-            _this3.goToStep(_this3.state.step - 1);
+            _this4.goToStep(_this4.state.step - 1);
           },
           stepForward: function stepForward() {
-            _this3.goToStep(_this3.state.step + 1);
+            _this4.goToStep(_this4.state.step + 1);
           }
         }
       }, {
@@ -27494,13 +27498,13 @@ var newAppInstance = function (_React$Component) {
           title: 'Select Right Layer',
           selectedResource: this.state.layerRight,
           onComplete: function onComplete(layer) {
-            _this3.setState({ layerRight: layer });
+            _this4.setState({ layerRight: layer });
           },
           stepBack: function stepBack() {
-            _this3.goToStep(_this3.state.step - 1);
+            _this4.goToStep(_this4.state.step - 1);
           },
           stepForward: function stepForward() {
-            _this3.goToStep(_this3.state.step + 1);
+            _this4.goToStep(_this4.state.step + 1);
           }
         }
       }, {
@@ -27512,15 +27516,10 @@ var newAppInstance = function (_React$Component) {
           app_instance_id: this.state.app_instance_id,
           savingIndicator: this.state.savingIndicator,
           stepBack: function stepBack() {
-            _this3.goToStep(_this3.state.step - 1);
+            _this4.goToStep(_this4.state.step - 1);
           },
           onComplete: function onComplete(theExtent) {
-            _this3.setState({ theExtent: theExtent });
-          },
-          save: function save(theExtent) {
-            _this3.setState({ theExtent: theExtent, savingIndicator: true }, function () {
-              _this3.saveAppInstance();
-            });
+            _this4.setState({ theExtent: theExtent });
           }
         }
       }];
@@ -27528,14 +27527,13 @@ var newAppInstance = function (_React$Component) {
       return _react2.default.createElement(
         'div',
         null,
-        _react2.default.createElement(_UserSelections2.default, {
-          selections: this.getSelections()
-        }),
-        _react2.default.createElement(_Navigator2.default, {
+        this.renderHeader(),
+        _react2.default.createElement(_EditModeNavigator2.default, {
+          errors: this.state.errors,
           steps: steps,
           step: step,
           onStepSelected: function onStepSelected(step) {
-            _this3.goToStep(step);
+            _this4.goToStep(step);
           } }),
         _react2.default.createElement(
           'div',
@@ -27560,7 +27558,9 @@ global.ReactDOM = _reactDom2.default;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(46)))
 
 /***/ }),
-/* 127 */
+/* 127 */,
+/* 128 */,
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27604,10 +27604,7 @@ var Navigator = function (_Component) {
   _createClass(Navigator, [{
     key: "onClick",
     value: function onClick(e, index) {
-      // this.props.onStepSelected(index)
-      if (index < this.props.step) {
-        this.props.onStepSelected(index);
-      }
+      this.props.onStepSelected(index);
     }
   }, {
     key: "item",
@@ -27618,7 +27615,7 @@ var Navigator = function (_Component) {
           step = _props.step,
           onStepSelected = _props.onStepSelected;
 
-      var className = index == step ? "list-group-item active" : index > step ? "list-group-item disabled" : "list-group-item";
+      var className = index == step ? "list-group-item active" : "list-group-item";
       return _react2.default.createElement(
         "li",
         {
@@ -27627,8 +27624,8 @@ var Navigator = function (_Component) {
           onClick: function onClick(e) {
             return _this2.onClick(e, index);
           } },
-        index < step && _react2.default.createElement("i", { className: "fa fa-check", "aria-hidden": "true" }),
-        label
+        label,
+        this.props.errors.indexOf(index) !== -1 && _react2.default.createElement("i", { className: "fa fa-exclamation-triangle error-tab", "aria-hidden": "true" })
       );
     }
   }, {
@@ -27658,8 +27655,6 @@ var Navigator = function (_Component) {
 exports.default = Navigator;
 
 /***/ }),
-/* 128 */,
-/* 129 */,
 /* 130 */,
 /* 131 */
 /***/ (function(module, exports, __webpack_require__) {

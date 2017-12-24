@@ -18,9 +18,12 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 25px 5px;
   margin-bottom: 25px;
   font-weight: bolder;
-  border-top: 1px solid lightgrey;
-  border-bottom: 1px solid lightgrey;
+}
+
+.error-tab{
+  float: right;
+  color: darkred;
+  font-size: larger;
 }

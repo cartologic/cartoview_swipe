@@ -2,17 +2,20 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
-import { default as WizardSteper } from './components/Navigator.jsx'
+import { default as WizardSteper } from './components/EditModeNavigator.jsx'
 import { default as ResourceSelector } from './components/ResourceSelector.jsx'
 import { default as General } from './components/General.jsx'
 import { default as MapExtent } from './components/MapExtent.jsx'
 import {default as SelectionsBox} from './components/UserSelections.jsx'
 
 import './css/style.css'
+import { validate } from 'tcomb-validation';
 
 export default class newAppInstance extends React.Component {
   state = {
     step: 0,
+    errors: [],
+
     app_instance_id: undefined,
     // general step default config
     title: "",
@@ -34,6 +37,23 @@ export default class newAppInstance extends React.Component {
     this.setState({step});
   }
 
+  validateConfig(instanceConfig) {
+    let a = []
+    if (instanceConfig.title === "") {
+      a.push(0)
+    }
+    if (instanceConfig.config.layerLeft === undefined) {
+      a.push(1)
+    }
+    if (instanceConfig.config.layerRight === undefined) {
+      a.push(2)
+    }
+    this.setState({ errors: a })
+    
+    if (a.length === 0) return true
+    return false
+  }
+
   saveAppInstance() {
     let instanceConfig = {
       title: this.state.title,
@@ -45,15 +65,19 @@ export default class newAppInstance extends React.Component {
         theExtent: this.state.theExtent
       }
     }
-    let url = URLS.new;
-    fetch(url, {
-      method: 'POST',
-      credentials: "same-origin",
-      headers: new Headers({"Content-Type": "application/json; charset=UTF-8", "X-CSRFToken": CSRF_TOKEN}),
-      body: JSON.stringify(instanceConfig)
-    })
-      .then((response) => response.json())
-      .then(data=> this.setState({app_instance_id: data.id, savingIndicator: false}))
+    if (this.validateConfig(instanceConfig)) {
+      let url = URLS.new;
+      fetch(url, {
+        method: 'POST',
+        credentials: "same-origin",
+        headers: new Headers({"Content-Type": "application/json; charset=UTF-8", "X-CSRFToken": CSRF_TOKEN}),
+        body: JSON.stringify(instanceConfig)
+      })
+        .then((response) => response.json())
+        .then(data=> this.setState({app_instance_id: data.id, savingIndicator: false}))
+    }else {
+      this.setState({savingIndicator: false})
+    }
   }
 
   getSelections() {
@@ -75,6 +99,35 @@ export default class newAppInstance extends React.Component {
     return a
   }
 
+  renderHeader() {
+    return (
+      <div className={'save-view-box'}>
+        <button
+          style={{
+          display: "inline-block",
+          margin: "0px 3px 0px 3px"
+          }}
+          className={this.state.app_instance_id ? "btn btn-primary btn-sm pull-right": "btn btn-primary btn-sm pull-right disabled"}
+          onClick={()=>window.location.href=`${site_url}apps/${app_name}/${this.state.app_instance_id}/view`}>
+          {"View"}
+        </button>
+        <button
+          style={{
+          display: "inline-block",
+          margin: "0px 3px 0px 3px"
+          }}
+          className={"btn btn-primary btn-sm pull-right"}
+          onClick={()=>{this.saveAppInstance()}}>
+          {"Save"}
+        </button>
+        {this.state.savingIndicator && <div className="loading"></div>}
+        <SelectionsBox
+          selections={this.getSelections()}  
+        />  
+      </div>
+    )
+  }
+
   render() {
     const steps = [
       {
@@ -93,7 +146,8 @@ export default class newAppInstance extends React.Component {
           },
           stepForward: () => {
             this.goToStep(this.state.step + 1)
-          }
+          },
+          error: this.state.errors.indexOf(0) !== -1 
         },
       },
       {
@@ -148,21 +202,15 @@ export default class newAppInstance extends React.Component {
           onComplete: (theExtent) => {
             this.setState({theExtent:theExtent})
           },
-          save: (theExtent) => {
-            this.setState({ theExtent: theExtent, savingIndicator: true }, () => {
-              this.saveAppInstance()
-            })
-          }
         }
       },
     ]
     const step = this.state.step
     return (
       <div>
-        <SelectionsBox
-          selections={this.getSelections()}  
-        />
+        {this.renderHeader()}
         <WizardSteper
+          errors = {this.state.errors}  
           steps={steps}
           step={step}
           onStepSelected={(step) => {this.goToStep(step)}} />

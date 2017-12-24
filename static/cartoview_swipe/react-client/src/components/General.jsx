@@ -4,7 +4,7 @@ import t from 'tcomb-form';
 const Access = t.enums({
   public: 'Public', private: 'Private (only me)',
 });
-const mapConfig = t.struct({title: t.String, abstract: t.String, access: Access});
+const formConfig = t.struct({title: t.String, abstract: t.maybe(t.String), access: Access});
 const options = {
   fields: {
     title: {
@@ -37,10 +37,16 @@ export default class General extends Component {
     basicConfig !== null && this.props.stepForward();
   }
 
+  onChange(value) {
+    this.setState({ defaultConfig: value }, ()=>{this.props.onComplete(this.state.defaultConfig)})
+  }
+
+  componentDidUpdate() {
+    if(this.props.error){this.refs.form.getValue()}
+  }
+
   componentWillUnmount() {
-    var basicConfig = this.refs.form.getValue();
-    if(basicConfig === null) return false
-    this.props.onComplete(basicConfig)
+    this.props.onComplete(this.state.defaultConfig)
   }
 
   render() {
@@ -50,22 +56,16 @@ export default class General extends Component {
           <div className="col-xs-5 col-md-4">
             <h4>{'General'}</h4>
           </div>
-          <div className="col-xs-7 col-md-8">
-            <button
-              style={{
-              display: "inline-block",
-              margin: "0px 3px 0px 3px"
-              }}
-              className="btn btn-primary btn-sm pull-right"
-              onClick={this.onNext.bind(this)}>
-              {"next >>"}
-            </button>
-          </div>
         </div>
 
         <hr></hr>
 
-        <Form ref="form" value={this.state.defaultConfig} type={mapConfig} options={options}/>
+        <Form
+          ref="form"
+          value={this.state.defaultConfig}
+          type={formConfig}
+          options={options}
+          onChange={this.onChange.bind(this)} />
       </div>
     )
   }

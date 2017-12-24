@@ -29,6 +29,7 @@ export default class MapExtent extends React.Component {
 
   componentDidMount() {
     this.serveMap()
+    this.map.on('moveend', () => { this.props.onComplete(this.map.getView().calculateExtent())})
   }
 
   componentWillUnmount() {
@@ -40,36 +41,6 @@ export default class MapExtent extends React.Component {
       <div className="row">
         <div className="col-xs-5 col-md-4">
           <h4>{this.props.title}</h4>
-        </div>
-        <div className="col-xs-7 col-md-8">
-          <button
-            style={{
-            display: "inline-block",
-            margin: "0px 3px 0px 3px"
-            }}
-            className={this.props.app_instance_id ? "btn btn-primary btn-sm pull-right": "btn btn-primary btn-sm pull-right disabled"}
-            onClick={()=>window.location.href=`${site_url}apps/${app_name}/${this.props.app_instance_id}/view`}>
-            {"View"}
-          </button>
-          <button
-            style={{
-            display: "inline-block",
-            margin: "0px 3px 0px 3px"
-            }}
-            className={"btn btn-primary btn-sm pull-right"}
-            onClick={()=>{this.props.save(this.map.getView().calculateExtent())}}>
-            {"Save"}
-          </button>
-          <button
-            style={{
-            display: "inline-block",
-            margin: "0px 3px 0px 3px"
-            }}
-            className="btn btn-primary btn-sm pull-right"
-            onClick={()=>{this.props.stepBack()}}>
-            {"<< Prev"}
-          </button>
-          {this.props.savingIndicator && <div className="loading"></div>}
         </div>
       </div>
     )

@@ -19,10 +19,6 @@ export default class Navigator extends Component {
         key={index}
         className={className}
         onClick={e => this.onClick(e, index)}>
-        {
-          index < step &&
-          <i className="fa fa-check" aria-hidden="true"></i>
-        }
         {label}
       </li>
     )
