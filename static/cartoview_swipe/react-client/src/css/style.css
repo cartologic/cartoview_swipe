@@ -9,7 +9,7 @@
   animation:spin 2s linear infinite;
 }
 
-.center-div {
-  margin-right: auto;
-  margin-left: auto
+.center-pagination {
+  display: flex;
+  justify-content: center;
 }

@@ -13,8 +13,10 @@ export default class ResourceSelector extends React.Component {
     selectedResource: this.props.selectedResource,
 
     showPagination: true,
-    currentPagination: 1,
-    initialPage: 0,
+    forcePage: 0,
+
+    limit: 50,
+    offset: 0,
   }
 
   setMyResources(myResources) {
@@ -29,41 +31,18 @@ export default class ResourceSelector extends React.Component {
   
   getResources(fetchUrl) {
     let url = this.state.myResources ?
-      fetchUrl+`&owner=${username}` :
-      fetchUrl
+      fetchUrl+ `&limit=${this.state.limit}&offset=${this.state.offset}` +`&owner=${username}` :
+      fetchUrl+ `&limit=${this.state.limit}&offset=${this.state.offset}`
     
     fetch(url, { credentials: 'include' })
       .then((response) => response.json())
       .then(data => {
         this.setState({
           resources: data.objects,
-          nextUrl: data.meta.next,
-          prevUrl: data.meta.previous,
+          resourcesCount: data.meta.total_count,
           loading: false
         })
       })
-  }
-
-  getNextPrevResources(next) {
-    if (next) {
-      this.state.nextUrl !== null &&
-        this.setState({
-            currentPagination: this.state.currentPagination += 1
-          },
-          () => {
-            this.getResources(`/apps/${app_name}` + this.state.nextUrl)
-          }
-        )
-    } else {
-      this.state.prevUrl !== null &&
-        this.setState({
-            currentPagination: this.state.currentPagination -= 1
-          },
-          () => {
-            this.getResources(`/apps/${app_name}` + this.state.prevUrl)
-          }
-        )
-    }
   }
 
   searchResources(resourceTitle) {
@@ -92,12 +71,16 @@ export default class ResourceSelector extends React.Component {
   loadInitialState() {
     this.setState({
       loading: true,
-      currentPagination: 1,
+
       showPagination: true,
-      initialPage: 0,
+      forcePage: 0,
+
       searchValue: '',
       selectedResourceIndex: this.props.selectedIndex,
       selectedResource: this.props.selectedResource,
+
+      limit: 50,
+      offset: 0,
     }, () => {
       this.getResources(this.props.resourcesApiUrl)
     })
@@ -109,6 +92,18 @@ export default class ResourceSelector extends React.Component {
 
   componentWillUnmount() {
     this.props.onComplete(this.state.selectedResource)
+  }
+
+  onPageChange(data) {
+    this.setState(
+      {
+        forcePage: data.selected,
+        offset: data.selected * this.state.limit
+      },
+      () => {
+        this.getResources(this.props.resourcesApiUrl)
+      }
+    )
   }
 
   onNext() {
@@ -269,46 +264,24 @@ export default class ResourceSelector extends React.Component {
     )
   }
 
-  // renderPagination() {
-  //   return (
-  //     <ul className="pagination">
-  //       <li>
-  //         <a onMouseDown={(e) => this.getNextPrevResources(false)} style={{
-  //           cursor: "default"
-  //         }}>{"<"}</a>
-  //       </li>
-  //       <li>
-  //         <a onMouseDown={(e) => e.preventDefault()} style={{
-  //           cursor: "default"
-  //         }}>{this.state.currentPagination}</a>
-  //       </li>
-  //       <li>
-  //         <a onMouseDown={(e) => this.getNextPrevResources(true)} style={{
-  //           cursor: "default"
-  //         }}>{">"}</a>
-  //       </li>
-  //     </ul>
-  //   )
-  // }
-
   renderPagination() {
     return (
-      <div>
-        <ReactPaginate
+
+      <ReactPaginate
         previousLabel={"Previous"}
-        initialPage = {this.state.initialPage}
+        forcePage = {this.state.forcePage}
         nextLabel={"Next"}
         breakLabel={< a href="javascript:;" > ...</a>}
         breakClassName={"break-me"}
         /* total resources / limit */  
-        pageCount={11 / 1}
-        marginPagesDisplayed={2}
-        pageRangeDisplayed={1}
-        onPageChange={(data)=>{console.log(data)}}
-        containerClassName={"pagination center-div"}
+        pageCount={this.state.resourcesCount / this.state.limit}
+        marginPagesDisplayed={3}
+        pageRangeDisplayed={2}
+        onPageChange={(data)=>this.onPageChange(data)}
+        containerClassName={"pagination center-pagination"}
         subContainerClassName={"pages pagination"}
         activeClassName={"active"} />
-      </div>
+
     )
   }
 
@@ -330,7 +303,11 @@ export default class ResourceSelector extends React.Component {
                 this.renderTip2()  
         }
         <br />
-        {this.state.showPagination && this.renderPagination()}
+        {
+          this.state.showPagination &&
+          Math.ceil(this.state.resourcesCount / this.state.limit) > 1 &&
+          this.renderPagination()
+        }
       </div>
     )
   }

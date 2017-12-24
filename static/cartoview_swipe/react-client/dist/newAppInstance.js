@@ -22020,8 +22020,10 @@ var ResourceSelector = function (_React$Component) {
       selectedResource: _this.props.selectedResource,
 
       showPagination: true,
-      currentPagination: 1,
-      initialPage: 0
+      forcePage: 0,
+
+      limit: 50,
+      offset: 0
     }, _temp), _possibleConstructorReturn(_this, _ret);
   }
 
@@ -22042,42 +22044,22 @@ var ResourceSelector = function (_React$Component) {
     value: function getResources(fetchUrl) {
       var _this3 = this;
 
-      var url = this.state.myResources ? fetchUrl + ('&owner=' + username) : fetchUrl;
+      var url = this.state.myResources ? fetchUrl + ('&limit=' + this.state.limit + '&offset=' + this.state.offset) + ('&owner=' + username) : fetchUrl + ('&limit=' + this.state.limit + '&offset=' + this.state.offset);
 
       fetch(url, { credentials: 'include' }).then(function (response) {
         return response.json();
       }).then(function (data) {
         _this3.setState({
           resources: data.objects,
-          nextUrl: data.meta.next,
-          prevUrl: data.meta.previous,
+          resourcesCount: data.meta.total_count,
           loading: false
         });
       });
     }
   }, {
-    key: 'getNextPrevResources',
-    value: function getNextPrevResources(next) {
-      var _this4 = this;
-
-      if (next) {
-        this.state.nextUrl !== null && this.setState({
-          currentPagination: this.state.currentPagination += 1
-        }, function () {
-          _this4.getResources('/apps/' + app_name + _this4.state.nextUrl);
-        });
-      } else {
-        this.state.prevUrl !== null && this.setState({
-          currentPagination: this.state.currentPagination -= 1
-        }, function () {
-          _this4.getResources('/apps/' + app_name + _this4.state.prevUrl);
-        });
-      }
-    }
-  }, {
     key: 'searchResources',
     value: function searchResources(resourceTitle) {
-      var _this5 = this;
+      var _this4 = this;
 
       if (resourceTitle === '') {
         this.loadInitialState();
@@ -22090,7 +22072,7 @@ var ResourceSelector = function (_React$Component) {
         fetch(url, { credentials: 'include' }).then(function (response) {
           return response.json();
         }).then(function (data) {
-          _this5.setState({
+          _this4.setState({
             resources: data.objects,
             loading: false,
             showPagination: false
@@ -22101,18 +22083,22 @@ var ResourceSelector = function (_React$Component) {
   }, {
     key: 'loadInitialState',
     value: function loadInitialState() {
-      var _this6 = this;
+      var _this5 = this;
 
       this.setState({
         loading: true,
-        currentPagination: 1,
+
         showPagination: true,
-        initialPage: 0,
+        forcePage: 0,
+
         searchValue: '',
         selectedResourceIndex: this.props.selectedIndex,
-        selectedResource: this.props.selectedResource
+        selectedResource: this.props.selectedResource,
+
+        limit: 50,
+        offset: 0
       }, function () {
-        _this6.getResources(_this6.props.resourcesApiUrl);
+        _this5.getResources(_this5.props.resourcesApiUrl);
       });
     }
   }, {
@@ -22124,6 +22110,18 @@ var ResourceSelector = function (_React$Component) {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
       this.props.onComplete(this.state.selectedResource);
+    }
+  }, {
+    key: 'onPageChange',
+    value: function onPageChange(data) {
+      var _this6 = this;
+
+      this.setState({
+        forcePage: data.selected,
+        offset: data.selected * this.state.limit
+      }, function () {
+        _this6.getResources(_this6.props.resourcesApiUrl);
+      });
     }
   }, {
     key: 'onNext',
@@ -22364,56 +22362,31 @@ var ResourceSelector = function (_React$Component) {
         )
       );
     }
-
-    // renderPagination() {
-    //   return (
-    //     <ul className="pagination">
-    //       <li>
-    //         <a onMouseDown={(e) => this.getNextPrevResources(false)} style={{
-    //           cursor: "default"
-    //         }}>{"<"}</a>
-    //       </li>
-    //       <li>
-    //         <a onMouseDown={(e) => e.preventDefault()} style={{
-    //           cursor: "default"
-    //         }}>{this.state.currentPagination}</a>
-    //       </li>
-    //       <li>
-    //         <a onMouseDown={(e) => this.getNextPrevResources(true)} style={{
-    //           cursor: "default"
-    //         }}>{">"}</a>
-    //       </li>
-    //     </ul>
-    //   )
-    // }
-
   }, {
     key: 'renderPagination',
     value: function renderPagination() {
-      return _react2.default.createElement(
-        'div',
-        null,
-        _react2.default.createElement(_reactPaginate2.default, {
-          previousLabel: "Previous",
-          initialPage: this.state.initialPage,
-          nextLabel: "Next",
-          breakLabel: _react2.default.createElement(
-            'a',
-            { href: 'javascript:;' },
-            ' ...'
-          ),
-          breakClassName: "break-me"
-          /* total resources / limit */
-          , pageCount: 11 / 1,
-          marginPagesDisplayed: 2,
-          pageRangeDisplayed: 1,
-          onPageChange: function onPageChange(data) {
-            console.log(data);
-          },
-          containerClassName: "pagination center-div",
-          subContainerClassName: "pages pagination",
-          activeClassName: "active" })
-      );
+      var _this9 = this;
+
+      return _react2.default.createElement(_reactPaginate2.default, {
+        previousLabel: "Previous",
+        forcePage: this.state.forcePage,
+        nextLabel: "Next",
+        breakLabel: _react2.default.createElement(
+          'a',
+          { href: 'javascript:;' },
+          ' ...'
+        ),
+        breakClassName: "break-me"
+        /* total resources / limit */
+        , pageCount: this.state.resourcesCount / this.state.limit,
+        marginPagesDisplayed: 3,
+        pageRangeDisplayed: 2,
+        onPageChange: function onPageChange(data) {
+          return _this9.onPageChange(data);
+        },
+        containerClassName: "pagination center-pagination",
+        subContainerClassName: "pages pagination",
+        activeClassName: "active" });
     }
   }, {
     key: 'render',
@@ -22427,7 +22400,7 @@ var ResourceSelector = function (_React$Component) {
         _react2.default.createElement('br', null),
         this.state.loading ? this.renderLoading() : this.state.resources && this.state.resources.length > 0 ? this.renderResources() : this.state.myResources ? this.renderTip1() : this.renderTip2(),
         _react2.default.createElement('br', null),
-        this.state.showPagination && this.renderPagination()
+        this.state.showPagination && Math.ceil(this.state.resourcesCount / this.state.limit) > 1 && this.renderPagination()
       );
     }
   }]);
@@ -27327,7 +27300,7 @@ exports = module.exports = __webpack_require__(60)(undefined);
 
 
 // module
-exports.push([module.i, ".loading{\n  border-radius: 100%;\n  border: 3px solid rgba(0, 0, 0, .1);\n  border-top-color: rgba(0, 0, 0, .45);\n  box-sizing: border-box;\n  height: 30px;\n  width: 30px;\n  -webkit-animation:spin .7s linear infinite;\n  animation:spin 2s linear infinite;\n}\n\n.center-div {\n  margin-right: auto;\n  margin-left: auto\n}", ""]);
+exports.push([module.i, ".loading{\n  border-radius: 100%;\n  border: 3px solid rgba(0, 0, 0, .1);\n  border-top-color: rgba(0, 0, 0, .45);\n  box-sizing: border-box;\n  height: 30px;\n  width: 30px;\n  -webkit-animation:spin .7s linear infinite;\n  animation:spin 2s linear infinite;\n}\n\n.center-pagination {\n  display: flex;\n  justify-content: center;\n}", ""]);
 
 // exports
 
