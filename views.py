@@ -42,7 +42,7 @@ def view(request, instance_id, template="%s/view.html" % APP_NAME, context={}):
         instance_id,
         'base.view_resourcebase',
         _PERMISSION_MSG_VIEW
-    )    
+    )
     instance = AppInstance.objects.get(pk=instance_id)
     context.update(instance=instance)
     context.update(app_name=APP_NAME)
@@ -85,19 +85,19 @@ def save(request, instance_id=None, app_name=APP_NAME):
 
     if access == "private":
         permessions = {
-                'users': {
-                    '{}'.format(request.user): owner_permissions,
-                }
+            'users': {
+                '{}'.format(request.user): owner_permissions,
             }
+        }
     else:
         permessions = {
-                'users': {
-                    '{}'.format(request.user): owner_permissions,
-                    'AnonymousUser': [
-                        'view_resourcebase',
-                    ],
-                }
+            'users': {
+                '{}'.format(request.user): owner_permissions,
+                'AnonymousUser': [
+                    'view_resourcebase',
+                ],
             }
+        }
     # set permissions so that no one can view this appinstance other than
     #  the user
     instance_obj.set_permissions(permessions)
@@ -113,7 +113,7 @@ def edit(request, instance_id, template="%s/edit.html" % APP_NAME, context={}):
         instance_id,
         'base.view_resourcebase',
         _PERMISSION_MSG_VIEW
-    )    
+    )
 
     if request.method == 'POST':
         return save(request, instance_id)

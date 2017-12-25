@@ -14,8 +14,8 @@ class LayerResource(ModelResource):
         queryset = Layer.objects.all()
         list_allowed_methods = ['get']
         resource_name = 'layers'
-        fields = ['title', 'thumbnail_url', 'abstract', 'typename',
-                  'detail_url',"owner"]
+        fields = ['id', 'title', 'thumbnail_url', 'abstract', 'typename',
+                  'detail_url', "owner"]
         authorization = GeoNodeAuthorization()
         filtering = {
             'typename': ALL,
@@ -46,6 +46,7 @@ class LayerResource(ModelResource):
         if owner:
             filters.update(dict(owner__username=owner))
         else:
-            permitted_ids = get_objects_for_user(request.user, 'base.view_resourcebase').values('id')
+            permitted_ids = get_objects_for_user(
+                request.user, 'base.view_resourcebase').values('id')
             filters.update(dict(id__in=permitted_ids))
         return super(LayerResource, self).apply_filters(request, filters)
