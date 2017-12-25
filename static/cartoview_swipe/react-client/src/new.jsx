@@ -20,7 +20,7 @@ export default class newAppInstance extends React.Component {
     // general step default config
     title: "",
     abstract: "",
-    access: "private",
+    access: "public",
 
     // selecl left layer step
     layerLeft: undefined,
