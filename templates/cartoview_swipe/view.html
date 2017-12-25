@@ -1,114 +1,93 @@
+{%load static%}
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>{{app_name}}</title>
-    <style>
-      body{
-        padding: 0;
-        margin: 0;
-      }
-      .swip-container{
-        position: fixed;
-        width: 100%;
-        display: flex;
-        justify-content: center;
-      }
-      #swip{
-        width: 99%;
-      }
-      #map{
-        width: 100%;
-        height: 100% !important;
-        position: fixed;
-        padding-top: 10px;
-      }
-    </style>
-    
-    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.4/css/ol.css" type="text/css">
-    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
-    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
-    <script src="https://openlayers.org/en/v4.6.4/build/ol.js"></script>
-  </head>
-  <body>
-    <div id="map" class="map"></div>
-    <div class="swip-container">
-      <input id="swipe" type="range" style="width: 100%">
-    </div>
-    
-    <script>
-        const site_url = "{{SITEURL}}"
-        const app_name = "{{app_name}}"
-        const app_instance_id = "{{instance.id}}"
-        const app_instance_config = {{instance.config | escape | safe}};
-        const layerLeftName = app_instance_config.layerLeft.typename;
-        const layerRightName = app_instance_config.layerRight.typename;
-        const theExtent = app_instance_config.theExtent;
-    
-      var osm = new ol.layer.Tile({
-        source: new ol.source.OSM()
-      });
-    
-      var layerRight = new ol.layer.Tile({
-        source: new ol.source.TileWMS({
-          url: "{{GEOSERVER_BASE_URL}}"+'wms',
-          params: {
-            'LAYERS': layerRightName,
-            'TILED': true
-          },
-          serverType: 'geoserver',
-          transition: 0
-        })
-      })
-    
-      var layerLeft = new ol.layer.Tile({
-        source: new ol.source.TileWMS({
-          url: "{{GEOSERVER_BASE_URL}}"+'wms',
-          params: {
-            'LAYERS': layerLeftName,
-            'TILED': true
-          },
-          serverType: 'geoserver',
-          transition: 0
-        })
-      });
-    
-      var map = new ol.Map({
-        layers: [osm, layerLeft, layerRight, ],
-        target: 'map',
-        controls: ol.control.defaults({
-          attributionOptions: {
-            collapsible: false
+
+<head>
+  <meta charset="utf-8">
+  <title>{{app_name}}</title>
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+    }
+
+    .swipe-container {
+      position: fixed;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    #swipe {
+      width: 99%;
+    }
+
+    #map {
+      width: 100%;
+      height: 100% !important;
+      position: fixed;
+      padding-top: 10px;
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://openlayers.org/en/v4.6.4/css/ol.css" type="text/css">
+  <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+  <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+  <script src="https://openlayers.org/en/v4.6.4/build/ol.js"></script>
+</head>
+
+<body>
+  <div id='reactjs-app'></div>
+
+  <script type="text/javascript">
+    function getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+          var cookie = cookies[i].trim();
+          // Does this cookie string begin with the name we want?
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
           }
-        }),
-        view: new ol.View({
-          center: [0, 0],
-          zoom: 2
-        })
-      });
-    
-      map.getView().fit(theExtent)
-    
-      var swipe = document.getElementById('swipe');
-    
-      layerRight.on('precompose', function (event) {
-        var ctx = event.context;
-        var width = ctx.canvas.width * (swipe.value / 100);
-    
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(width, 0, ctx.canvas.width - width, ctx.canvas.height);
-        ctx.clip();
-      });
-    
-      layerRight.on('postcompose', function (event) {
-        var ctx = event.context;
-        ctx.restore();
-      });
-    
-      swipe.addEventListener('input', function () {
-        map.render();
-      }, false);
-    </script>
-  </body>
+        }
+      }
+      return cookieValue;
+    }
+    const CSRF_TOKEN = getCookie('csrftoken');
+
+    const app_name = "{{app_name}}"
+    const site_url = "{{SITEURL}}"
+    const app_instance_id = "{{instance.id}}"
+    const app_instance_config = {{instance.config | escape | safe}};
+    const layerLeftName = app_instance_config.layerLeft.typename;
+    const layerRightName = app_instance_config.layerRight.typename;
+    const theExtent = app_instance_config.theExtent;
+
+    const URLS = {
+      geoserver: "{{ GEOSERVER_BASE_URL }}",
+      layersApiUrl: "/apps/{{app_name}}/api/layers/?",
+      searchByTitleApiUrl: "/apps/{{app_name}}/api/layers/?typename=",
+      new: "/apps/{{app_name}}/new/",
+    };
+
+    {% if request.user.is_authenticated %}
+    const user_logged_in = true
+    const username = '{{request.user}}' 
+    {% else %}
+    const user_logged_in = false
+    const username = undefined 
+    {% endif %}
+  </script>
+
+  {% static "" as staticUrl %}
+  <script src='{{staticUrl}}{{app_name}}/react-client/dist/viewAppInstance.js'></script>
+  <script type="text/javascript">
+    const props = {}
+    var app = React.createElement(viewAppInstance, props);
+    ReactDOM.render(app, document.getElementById("reactjs-app"));
+  </script>
+</body>
+
 </html>

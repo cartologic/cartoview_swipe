@@ -381,34 +381,71 @@ var viewAppInstance = function (_React$Component) {
   _createClass(viewAppInstance, [{
     key: 'serveMap',
     value: function serveMap() {
-      var layers = [new _openlayers2.default.layer.Tile({
+      var osm = new _openlayers2.default.layer.Tile({
         source: new _openlayers2.default.source.OSM()
-      }), new _openlayers2.default.layer.Tile({
-        extent: [-13884991, 2870341, -7455066, 6338219],
+      });
+
+      var layerRight = new _openlayers2.default.layer.Tile({
         source: new _openlayers2.default.source.TileWMS({
-          url: 'https://ahocevar.com/geoserver/wms',
-          params: { 'LAYERS': 'topp:states', 'TILED': true },
+          url: URLS.geoserver + 'wms',
+          params: {
+            'LAYERS': layerRightName,
+            'TILED': true
+          },
           serverType: 'geoserver',
-          // Countries have transparency, so do not fade tiles:
           transition: 0
         })
-      }), new _openlayers2.default.layer.Tile({
+      });
+
+      var layerLeft = new _openlayers2.default.layer.Tile({
         source: new _openlayers2.default.source.TileWMS({
-          url: 'http://cartoview.localhost/geoserver/wms',
-          params: { 'LAYERS': 'geonode:animal_abuse_lacity', 'TILED': true },
+          url: URLS.geoserver + 'wms',
+          params: {
+            'LAYERS': layerLeftName,
+            'TILED': true
+          },
           serverType: 'geoserver',
-          transition: 10
+          transition: 0
         })
-      })];
+      });
 
       this.map = new _openlayers2.default.Map({
-        layers: layers,
+        layers: [osm, layerLeft, layerRight],
         target: this.mapId,
+        controls: _openlayers2.default.control.defaults({
+          attributionOptions: {
+            collapsible: false
+          }
+        }),
         view: new _openlayers2.default.View({
           center: [0, 0],
           zoom: 2
         })
       });
+
+      this.map.getView().fit(theExtent);
+
+      var swipe = this.rangeInput;
+
+      layerRight.on('precompose', function (event) {
+        var ctx = event.context;
+        var width = ctx.canvas.width * (swipe.value / 100);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(width, 0, ctx.canvas.width - width, ctx.canvas.height);
+        ctx.clip();
+      });
+
+      layerRight.on('postcompose', function (event) {
+        var ctx = event.context;
+        ctx.restore();
+      });
+
+      var _map = this.map;
+      swipe.addEventListener('input', function () {
+        _map.render();
+      }, false);
     }
   }, {
     key: 'componentDidMount',
@@ -427,18 +464,20 @@ var viewAppInstance = function (_React$Component) {
           ref: function ref(m) {
             return _this2.mapId = m;
           },
+          id: 'map',
           className: 'map',
           style: { width: '100%', height: '400px' } }),
-        _react2.default.createElement('input', {
-          id: 'swipe',
-          type: 'range',
-          style: { width: '100%' },
-          ref: function ref(input) {
-            _this2.rangeInput = input;
-          },
-          onChange: function onChange(e) {
-            console.log(_this2.rangeInput.value);
-          } })
+        _react2.default.createElement(
+          'div',
+          { className: 'swipe-container' },
+          _react2.default.createElement('input', {
+            id: 'swipe',
+            type: 'range',
+            ref: function ref(input) {
+              _this2.rangeInput = input;
+            }
+          })
+        )
       );
     }
   }]);

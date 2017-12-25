@@ -7,38 +7,71 @@ import ol from 'openlayers'
 export default class viewAppInstance extends React.Component {
 
   serveMap() {
-    var layers = [
-      new ol.layer.Tile({
-        source: new ol.source.OSM()
-      }),
-      new ol.layer.Tile({
-        extent: [-13884991, 2870341, -7455066, 6338219],
-        source: new ol.source.TileWMS({
-          url: 'https://ahocevar.com/geoserver/wms',
-          params: { 'LAYERS': 'topp:states', 'TILED': true },
-          serverType: 'geoserver',
-          // Countries have transparency, so do not fade tiles:
-          transition: 0
-        })
-      }),
-      new ol.layer.Tile({
-        source: new ol.source.TileWMS({
-          url: 'http://cartoview.localhost/geoserver/wms',
-          params: { 'LAYERS': 'geonode:animal_abuse_lacity', 'TILED': true },
-          serverType: 'geoserver',
-          transition: 10
-        })
-      }),
-    ];
-
+    var osm = new ol.layer.Tile({
+      source: new ol.source.OSM()
+    });
+  
+    var layerRight = new ol.layer.Tile({
+      source: new ol.source.TileWMS({
+        url: URLS.geoserver+'wms',
+        params: {
+          'LAYERS': layerRightName,
+          'TILED': true
+        },
+        serverType: 'geoserver',
+        transition: 0
+      })
+    })
+  
+    var layerLeft = new ol.layer.Tile({
+      source: new ol.source.TileWMS({
+        url: URLS.geoserver+'wms',
+        params: {
+          'LAYERS': layerLeftName,
+          'TILED': true
+        },
+        serverType: 'geoserver',
+        transition: 0
+      })
+    });
+  
     this.map = new ol.Map({
-      layers: layers,
+      layers: [osm, layerLeft, layerRight, ],
       target: this.mapId,
+      controls: ol.control.defaults({
+        attributionOptions: {
+          collapsible: false
+        }
+      }),
       view: new ol.View({
         center: [0, 0],
         zoom: 2
       })
     });
+  
+    this.map.getView().fit(theExtent)
+  
+    var swipe = this.rangeInput
+  
+    layerRight.on('precompose', function (event) {
+      var ctx = event.context;
+      var width = ctx.canvas.width * (swipe.value / 100);
+  
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(width, 0, ctx.canvas.width - width, ctx.canvas.height);
+      ctx.clip();
+    });
+  
+    layerRight.on('postcompose', function (event) {
+      var ctx = event.context;
+      ctx.restore();
+    });
+    
+    const _map = this.map
+    swipe.addEventListener('input', function () {
+      _map.render();
+    }, false);
   }
 
   componentDidMount() {
@@ -50,14 +83,16 @@ export default class viewAppInstance extends React.Component {
       <div>
         <div
           ref={m => this.mapId = m}
+          id={'map'}
           className="map"
           style={{ width: '100%', height: '400px' }}></div>
+        <div className="swipe-container">
         <input
           id="swipe"
           type="range"
-          style={{ width: '100%' }}
           ref={(input) => { this.rangeInput = input; }}
-          onChange={(e) => { console.log(this.rangeInput.value) }} />
+          />
+        </div>
       </div>
     )
   }
