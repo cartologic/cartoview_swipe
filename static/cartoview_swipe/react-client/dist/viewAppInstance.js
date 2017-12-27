@@ -26248,7 +26248,7 @@ var viewAppInstance = function (_React$Component) {
           serverType: 'geoserver',
           transition: 0,
           tileLoadFunction: function tileLoadFunction(imageTile, src) {
-            imageTile.getImage().src = '/proxy/?url=' + encodeURIComponent(src).replace(/%20/g, '+');
+            imageTile.getImage().src = '' + (URLS.proxy !== null ? URLS.proxy : '') + encodeURIComponent(src).replace(/%20/g, '+');
           }
         })
       });
@@ -26263,10 +26263,25 @@ var viewAppInstance = function (_React$Component) {
           serverType: 'geoserver',
           transition: 0,
           tileLoadFunction: function tileLoadFunction(imageTile, src) {
-            imageTile.getImage().src = '/proxy/?url=' + encodeURIComponent(src).replace(/%20/g, '+');
+            imageTile.getImage().src = '' + (URLS.proxy !== null ? URLS.proxy : '') + encodeURIComponent(src).replace(/%20/g, '+');
           }
         })
       });
+
+      // var layerLeft = new ol.layer.Tile({
+      //   source: new ol.source.TileWMS({
+      //     url: URLS.geoserver+'wms',
+      //     params: {
+      //       'LAYERS': layerLeftName,
+      //       'TILED': true
+      //     },
+      //     serverType: 'geoserver',
+      //     transition: 0,
+      //     tileLoadFunction:function(imageTile, src) {
+      //       imageTile.getImage().src = `${URLS.proxy !== null ? URLS.proxy : ''}`+encodeURIComponent(src).replace(/%20/g, '+');
+      //     }
+      //   })
+      // });
 
       this.map = new _openlayers2.default.Map({
         layers: [backgroundBaseMaps, layerLeft, layerRight],

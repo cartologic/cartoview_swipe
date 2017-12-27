@@ -89,6 +89,12 @@ export default class ResourceSelector extends React.Component {
     this.loadInitialState()
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props != nextProps) {
+      this.setState({selectedResource: nextProps.selectedResource})
+    }
+  }
+
   componentWillUnmount() {
     this.props.onComplete(this.state.selectedResource)
   }
@@ -111,6 +117,10 @@ export default class ResourceSelector extends React.Component {
 
   onPrev() {
     this.props.stepBack()
+  }
+
+  handleSelection(resource) {
+    this.props.onComplete(resource)
   }
 
   renderHeader() {
@@ -164,7 +174,7 @@ export default class ResourceSelector extends React.Component {
           <li
             key={i}  
             className="list-group-item"
-            onClick={() => { this.setState({selectedResource: resource }) }}
+            onClick={() => { this.handleSelection(resource) }}
             style={
               this.state.selectedResource && this.state.selectedResource.typename === resource.typename ?
                 {

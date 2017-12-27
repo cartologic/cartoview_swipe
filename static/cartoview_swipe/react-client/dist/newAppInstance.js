@@ -21173,6 +21173,13 @@ var ResourceSelector = function (_React$Component) {
       this.loadInitialState();
     }
   }, {
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(nextProps) {
+      if (this.props != nextProps) {
+        this.setState({ selectedResource: nextProps.selectedResource });
+      }
+    }
+  }, {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
       this.props.onComplete(this.state.selectedResource);
@@ -21198,6 +21205,11 @@ var ResourceSelector = function (_React$Component) {
     key: 'onPrev',
     value: function onPrev() {
       this.props.stepBack();
+    }
+  }, {
+    key: 'handleSelection',
+    value: function handleSelection(resource) {
+      this.props.onComplete(resource);
     }
   }, {
     key: 'renderHeader',
@@ -21284,7 +21296,7 @@ var ResourceSelector = function (_React$Component) {
               key: i,
               className: 'list-group-item',
               onClick: function onClick() {
-                _this8.setState({ selectedResource: resource });
+                _this8.handleSelection(resource);
               },
               style: _this8.state.selectedResource && _this8.state.selectedResource.typename === resource.typename ? {
                 boxShadow: "0px 0px 10px 5px steelblue",
