@@ -2,15 +2,22 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
+import {default as LeftDrawer} from './components/Drawer/DrawerWithButton.jsx'
 import ol from 'openlayers'
 
+import FileSaver from 'file-saver'
+
 export default class viewAppInstance extends React.Component {
+  state = {
+    leftDrawerOpen: false,
+    baseMapOptions: undefined,
+  }
 
   serveMap() {
-    var osm = new ol.layer.Tile({
-      source: new ol.source.OSM()
-    });
-  
+    var backgroundBaseMaps = new ol.layer.Group({
+      layers: this.basemapsLayers 
+    })
+
     var layerRight = new ol.layer.Tile({
       source: new ol.source.TileWMS({
         url: URLS.geoserver+'wms',
@@ -19,7 +26,10 @@ export default class viewAppInstance extends React.Component {
           'TILED': true
         },
         serverType: 'geoserver',
-        transition: 0
+        transition: 0,
+        tileLoadFunction:function(imageTile, src) {
+          imageTile.getImage().src = '/proxy/?url='+encodeURIComponent(src).replace(/%20/g, '+');
+        }
       })
     })
   
@@ -31,12 +41,15 @@ export default class viewAppInstance extends React.Component {
           'TILED': true
         },
         serverType: 'geoserver',
-        transition: 0
+        transition: 0,
+        tileLoadFunction:function(imageTile, src) {
+          imageTile.getImage().src = '/proxy/?url='+encodeURIComponent(src).replace(/%20/g, '+');
+        }
       })
     });
   
     this.map = new ol.Map({
-      layers: [osm, layerLeft, layerRight, ],
+      layers: [backgroundBaseMaps, layerLeft, layerRight,],
       target: this.mapId,
       controls: ol.control.defaults({
         attributionOptions: {
@@ -72,10 +85,81 @@ export default class viewAppInstance extends React.Component {
     swipe.addEventListener('input', function () {
       _map.render();
     }, false);
+
+    // this.map.getLayers().getArray()[0].getLayers().getArray()[0].setVisible(true)
+    // console.log(this.map.getLayers().getArray()[0].getLayers().getArray()[0].get('name'))
+  }
+
+  getBaseMaps() {
+    let options = []
+    this.basemapsLayers = []
+    basemaps.filter((b, i) => {
+      if (b.name === 'background') {
+        options.push('NoBackground')
+        this.basemapsLayers.push(
+          new ol.layer.Tile({
+            source: new ol.source['OSM'](),
+            name: 'NoBackground',
+            visible: false
+          })
+        )
+      }
+
+      if (b.name === 'mapnik') {
+        options.push('OSMBaseMap')
+        this.basemapsLayers.push(new ol.layer.Tile({
+          source: new ol.source['OSM'](),
+          name: 'OSMBaseMap',
+          visible: true
+        }))
+      }
+    })
+    this.setState({
+      baseMapOptions: options
+    })
   }
 
   componentDidMount() {
+    this.getBaseMaps()
     this.serveMap()
+  }
+
+  exportMap(map) {
+    console.log(map)
+    map.once('postcompose', (event) => {
+      let canvas = event.context.canvas
+      console.log(canvas)      
+      if (navigator.msSaveBlob) {
+        navigator.msSaveBlob(canvas.msToBlob(), 'map.png')
+      } else {
+        canvas.toBlob((blob) => {
+          FileSaver.saveAs(blob, 'map.png')
+        })
+      }
+    })
+    map.renderSync()
+  }
+
+  setBaseMap(currentBaseMap, previousBaseMap) {
+    if (currentBaseMap === 'NoBackground') {
+      this.map.getLayers().getArray()[0].getLayers().getArray().map((b,i) => {
+        b.get('name') === previousBaseMap &&
+          this.map.getLayers().getArray()[0].getLayers().getArray()[i].setVisible(false)
+      })
+      return false
+    }
+
+    // setVisible of previousBaseMap = false
+    this.map.getLayers().getArray()[0].getLayers().getArray().map((b,i) => {
+      b.get('name') === previousBaseMap && 
+        this.map.getLayers().getArray()[0].getLayers().getArray()[i].setVisible(false)  
+    })
+
+    // setVisible of currentBaseMap = true
+    this.map.getLayers().getArray()[0].getLayers().getArray().map((b,i) => {
+      b.get('name') === currentBaseMap &&
+        this.map.getLayers().getArray()[0].getLayers().getArray()[i].setVisible(true)    
+    })
   }
 
   render() {
@@ -84,8 +168,7 @@ export default class viewAppInstance extends React.Component {
         <div
           ref={m => this.mapId = m}
           id={'map'}
-          className="map"
-          style={{ width: '100%', height: '400px' }}></div>
+          className="map"></div>
         <div className="swipe-container">
         <input
           id="swipe"
@@ -93,6 +176,15 @@ export default class viewAppInstance extends React.Component {
           ref={(input) => { this.rangeInput = input; }}
           />
         </div>
+        <LeftDrawer
+          config = {{formTitle: app_instance_title, formAbstract:app_instance_abstract}}
+          drawerOpen={this.state.leftDrawerOpen}
+          handleDrawerOpen={()=>{this.setState({leftDrawerOpen: true})}}
+          handleDrawerClose={() => { this.setState({ leftDrawerOpen: false }) }}
+          baseMapOptions={this.state.baseMapOptions && this.state.baseMapOptions}
+          setBaseMap = {(currentBaseMap, previousBaseMap)=>{this.setBaseMap(currentBaseMap, previousBaseMap)}}
+          exportMap = {()=>{this.exportMap(this.map)}}
+        />
       </div>
     )
   }
