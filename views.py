@@ -6,6 +6,7 @@ from django.shortcuts import (
 )
 from django.contrib.auth.decorators import login_required
 from django.utils.safestring import mark_safe
+from django.conf import settings
 
 from geonode.maps.views import _PERMISSION_MSG_VIEW
 
@@ -46,6 +47,7 @@ def view(request, instance_id, template="%s/view.html" % APP_NAME, context={}):
     instance = AppInstance.objects.get(pk=instance_id)
     context.update(instance=instance)
     context.update(app_name=APP_NAME)
+    context.update(basemaps=json.dumps(settings.MAP_BASELAYERS))
     return render(request, template, context)
 
 
