@@ -79,7 +79,14 @@
     const layerRightName = app_instance_config.layerRight.typename;
     const theExtent = app_instance_config.theExtent;
 
+    {% if PROXY_URL %}
+      const PROXY_URL='{{PROXY_URL}}'
+    {% else %}
+      const PROXY_URL=null
+    {% endif %}
+
     const URLS = {
+      proxy: PROXY_URL,
       geoserver: "{{ GEOSERVER_BASE_URL }}",
       layersApiUrl: "/apps/{{app_name}}/api/layers/?",
       searchByTitleApiUrl: "/apps/{{app_name}}/api/layers/?typename=",

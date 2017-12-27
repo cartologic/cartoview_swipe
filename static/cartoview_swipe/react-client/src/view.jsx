@@ -28,11 +28,11 @@ export default class viewAppInstance extends React.Component {
         serverType: 'geoserver',
         transition: 0,
         tileLoadFunction:function(imageTile, src) {
-          imageTile.getImage().src = '/proxy/?url='+encodeURIComponent(src).replace(/%20/g, '+');
+          imageTile.getImage().src = `${URLS.proxy !== null ? URLS.proxy : ''}`+encodeURIComponent(src).replace(/%20/g, '+');
         }
       })
     })
-  
+
     var layerLeft = new ol.layer.Tile({
       source: new ol.source.TileWMS({
         url: URLS.geoserver+'wms',
@@ -43,10 +43,26 @@ export default class viewAppInstance extends React.Component {
         serverType: 'geoserver',
         transition: 0,
         tileLoadFunction:function(imageTile, src) {
-          imageTile.getImage().src = '/proxy/?url='+encodeURIComponent(src).replace(/%20/g, '+');
+          imageTile.getImage().src = `${URLS.proxy !== null ? URLS.proxy : ''}`+encodeURIComponent(src).replace(/%20/g, '+');
         }
       })
-    });
+    })
+  
+
+    // var layerLeft = new ol.layer.Tile({
+    //   source: new ol.source.TileWMS({
+    //     url: URLS.geoserver+'wms',
+    //     params: {
+    //       'LAYERS': layerLeftName,
+    //       'TILED': true
+    //     },
+    //     serverType: 'geoserver',
+    //     transition: 0,
+    //     tileLoadFunction:function(imageTile, src) {
+    //       imageTile.getImage().src = `${URLS.proxy !== null ? URLS.proxy : ''}`+encodeURIComponent(src).replace(/%20/g, '+');
+    //     }
+    //   })
+    // });
   
     this.map = new ol.Map({
       layers: [backgroundBaseMaps, layerLeft, layerRight,],
