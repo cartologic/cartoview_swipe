@@ -27,3 +27,23 @@
   color: darkred;
   font-size: larger;
 }
+
+.layer-titles-box{
+  position: fixed;
+  width: 95%;
+  left: auto;
+  right: auto;
+  top: 30px;
+
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.layer-title{
+  border: 2px solid darkblue;
+  padding: 2px;
+
+  font-weight: bolder;
+  color: darkblue;
+}

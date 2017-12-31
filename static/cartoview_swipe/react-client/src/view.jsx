@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
+import './css/style.css'
 
 import {default as LeftDrawer} from './components/Drawer/DrawerWithButton.jsx'
 import ol from 'openlayers'
@@ -15,7 +16,8 @@ export default class viewAppInstance extends React.Component {
 
   serveMap() {
     var backgroundBaseMaps = new ol.layer.Group({
-      layers: this.basemapsLayers 
+      layers: this.basemapsLayers,
+      name: 'background'
     })
 
     var layerRight = new ol.layer.Tile({
@@ -109,19 +111,27 @@ export default class viewAppInstance extends React.Component {
   getBaseMaps() {
     let options = []
     this.basemapsLayers = []
+    // where basemaps is defined in the html template
+    // TODO: Pass basemaps using props
     basemaps.filter((b, i) => {
       if (b.name === 'background') {
-        options.push('NoBackground')
-        this.basemapsLayers.push(
-          new ol.layer.Tile({
-            source: new ol.source['OSM'](),
-            name: 'NoBackground',
-            visible: false
-          })
-        )
+        options.push('No Background')
+        this.basemapsLayers.push(new ol.layer.Tile({}))
       }
 
-      if (b.name === 'mapnik') {
+      // if (b.name === 'AerialWithLabels') {
+      //   options.push('Bing')
+      //   this.basemapsLayers.push(
+      //     new ol.layer.Tile({
+      //       source: new ol.source.BingMaps({
+      //         key: 'AnOGiCu2mPu9KfPl3rzvWLpRovXmBsnHEdEli8NR1NE99Av5BGNo2PfsXsJbsjum'
+      //       }),
+      //       visible: false
+      //     })
+      //   )
+      // }
+
+      if (b.type === 'OpenLayers.Layer.OSM') {
         options.push('OSMBaseMap')
         this.basemapsLayers.push(new ol.layer.Tile({
           source: new ol.source['OSM'](),
@@ -129,7 +139,20 @@ export default class viewAppInstance extends React.Component {
           visible: true
         }))
       }
+
+      // OpenLayers.Layer.XYZ
+      if (b.type === 'OpenLayers.Layer.XYZ') {
+        options.push(b.args[0])
+        this.basemapsLayers.push(new ol.layer.Tile({
+          source: new ol.source.XYZ({
+            url: String(b.args[1]).replace("${z}/${x}/${y}", "{z}/{x}/{y}")
+          }),
+          name: b.args[0],
+          visible: false
+        }))
+      }
     })
+
     this.setState({
       baseMapOptions: options
     })
@@ -157,7 +180,7 @@ export default class viewAppInstance extends React.Component {
   }
 
   setBaseMap(currentBaseMap, previousBaseMap) {
-    if (currentBaseMap === 'NoBackground') {
+    if (currentBaseMap === 'No Background') {
       this.map.getLayers().getArray()[0].getLayers().getArray().map((b,i) => {
         b.get('name') === previousBaseMap &&
           this.map.getLayers().getArray()[0].getLayers().getArray()[i].setVisible(false)
@@ -178,6 +201,19 @@ export default class viewAppInstance extends React.Component {
     })
   }
 
+  renderLayerTitles() {
+    return (
+      <div className={'layer-titles-box'}>
+        <div className={'layer-title layer-title-left'}>
+          {app_instance_config.layerLeft.title} 
+        </div>  
+        <div className={'layer-title layer-title-left'}>
+          {app_instance_config.layerRight.title}
+        </div>  
+      </div>
+    )
+  }
+
   render() {
     return (
       <div>
@@ -192,6 +228,7 @@ export default class viewAppInstance extends React.Component {
           ref={(input) => { this.rangeInput = input; }}
           />
         </div>
+        {this.renderLayerTitles()}        
         <LeftDrawer
           config = {{formTitle: app_instance_title, formAbstract:app_instance_abstract}}
           drawerOpen={this.state.leftDrawerOpen}
