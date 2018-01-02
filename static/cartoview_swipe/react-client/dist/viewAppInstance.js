@@ -27041,24 +27041,6 @@ var viewAppInstance = function (_React$Component) {
       });
     }
   }, {
-    key: 'renderLayerTitles',
-    value: function renderLayerTitles() {
-      return _react2.default.createElement(
-        'div',
-        { className: 'layer-titles-box' },
-        _react2.default.createElement(
-          'div',
-          { className: 'layer-title layer-title-left' },
-          app_instance_config.layerLeft.title
-        ),
-        _react2.default.createElement(
-          'div',
-          { className: 'layer-title layer-title-left' },
-          app_instance_config.layerRight.title
-        )
-      );
-    }
-  }, {
     key: 'render',
     value: function render() {
       var _this4 = this;
@@ -27083,7 +27065,6 @@ var viewAppInstance = function (_React$Component) {
             }
           })
         ),
-        this.renderLayerTitles(),
         _react2.default.createElement(_DrawerWithButton2.default, {
           config: { formTitle: app_instance_title, formAbstract: app_instance_abstract },
           drawerOpen: this.state.leftDrawerOpen,

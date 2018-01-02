@@ -201,19 +201,6 @@ export default class viewAppInstance extends React.Component {
     })
   }
 
-  renderLayerTitles() {
-    return (
-      <div className={'layer-titles-box'}>
-        <div className={'layer-title layer-title-left'}>
-          {app_instance_config.layerLeft.title} 
-        </div>  
-        <div className={'layer-title layer-title-left'}>
-          {app_instance_config.layerRight.title}
-        </div>  
-      </div>
-    )
-  }
-
   render() {
     return (
       <div>
@@ -227,8 +214,7 @@ export default class viewAppInstance extends React.Component {
           type="range"
           ref={(input) => { this.rangeInput = input; }}
           />
-        </div>
-        {this.renderLayerTitles()}        
+        </div>     
         <LeftDrawer
           config = {{formTitle: app_instance_title, formAbstract:app_instance_abstract}}
           drawerOpen={this.state.leftDrawerOpen}
