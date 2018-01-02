@@ -26843,7 +26843,7 @@ var viewAppInstance = function (_React$Component) {
     }
 
     return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = viewAppInstance.__proto__ || Object.getPrototypeOf(viewAppInstance)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
-      leftDrawerOpen: false,
+      leftDrawerOpen: app_instance_config.defaultDrawerOpen,
       baseMapOptions: undefined
     }, _temp), _possibleConstructorReturn(_this, _ret);
   }

@@ -32698,6 +32698,10 @@ var _Access = __webpack_require__(255);
 
 var _Access2 = _interopRequireDefault(_Access);
 
+var _DrawerOptions = __webpack_require__(488);
+
+var _DrawerOptions2 = _interopRequireDefault(_DrawerOptions);
+
 var _utils = __webpack_require__(276);
 
 __webpack_require__(110);
@@ -32746,9 +32750,6 @@ var editAppInstance = function (_React$Component) {
       step: 3,
       errors: [],
 
-      profiles: undefined,
-      accessConfig: getFormValue(app_instance_config),
-
       app_instance_id: app_instance_id,
       // general step default config
       title: app_instance_title,
@@ -32762,7 +32763,14 @@ var editAppInstance = function (_React$Component) {
       layerRight: app_instance_config.layerRight,
 
       // set extent step
-      theExtent: app_instance_config.theExtent
+      theExtent: app_instance_config.theExtent,
+
+      // access config step
+      profiles: undefined,
+      accessConfig: getFormValue(app_instance_config),
+
+      // Drawer options step
+      defaultDrawerOpen: app_instance_config.defaultDrawerOpen
     }, _this.getProfiles = function () {
       var url = URLS.profilesAPI;
       (0, _utils.doGet)(url).then(function (result) {
@@ -32815,17 +32823,18 @@ var editAppInstance = function (_React$Component) {
   }, {
     key: 'saveAppInstance',
     value: function saveAppInstance() {
-      var _this2 = this;
+      var _config,
+          _this2 = this;
 
       var instanceConfig = {
         title: this.state.title,
         abstract: this.state.abstract,
-        config: _defineProperty({
+        config: (_config = {
           access: this.state.access,
           layerLeft: this.state.layerLeft,
           layerRight: this.state.layerRight,
           theExtent: this.state.theExtent
-        }, 'access', this.getFormValueForSaving(this.state.accessConfig))
+        }, _defineProperty(_config, 'access', this.getFormValueForSaving(this.state.accessConfig)), _defineProperty(_config, 'defaultDrawerOpen', this.state.defaultDrawerOpen), _config)
       };
       if (this.validateConfig(instanceConfig)) {
         var url = URLS.edit;
@@ -32994,6 +33003,17 @@ var editAppInstance = function (_React$Component) {
           onComplete: function onComplete(data) {
             _this4.setState({
               accessConfig: data
+            });
+          }
+        }
+      }, {
+        label: "Drawer Options",
+        component: _DrawerOptions2.default,
+        props: {
+          defaultDrawerOpen: this.state.defaultDrawerOpen,
+          onComplete: function onComplete(data) {
+            _this4.setState({
+              defaultDrawerOpen: data.defaultDrawerOpen
             });
           }
         }
@@ -33283,6 +33303,119 @@ exports.push([module.i, "/**\n * React Select\n * ============\n * Created by Je
 
 // exports
 
+
+/***/ }),
+/* 488 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _tcombForm = __webpack_require__(95);
+
+var _tcombForm2 = _interopRequireDefault(_tcombForm);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var formConfig = _tcombForm2.default.struct({
+  defaultDrawerOpen: _tcombForm2.default.Boolean
+});
+var options = {
+  fields: {
+    defaultDrawerOpen: {
+      label: "Default Drawer Open"
+    }
+  }
+};
+var Form = _tcombForm2.default.form.Form;
+
+var DrawerOptions = function (_Component) {
+  _inherits(DrawerOptions, _Component);
+
+  function DrawerOptions(props) {
+    _classCallCheck(this, DrawerOptions);
+
+    var _this = _possibleConstructorReturn(this, (DrawerOptions.__proto__ || Object.getPrototypeOf(DrawerOptions)).call(this, props));
+
+    _this.state = {
+      defaultConfig: {
+        defaultDrawerOpen: _this.props.defaultDrawerOpen
+      }
+    };
+    return _this;
+  }
+
+  _createClass(DrawerOptions, [{
+    key: 'onChange',
+    value: function onChange(value) {
+      var _this2 = this;
+
+      this.setState({ defaultConfig: value }, function () {
+        _this2.props.onComplete(_this2.state.defaultConfig);
+      });
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate() {
+      if (this.props.error) {
+        this.refs.form.getValue();
+      }
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      this.props.onComplete(this.state.defaultConfig);
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(
+          'div',
+          { className: 'row' },
+          _react2.default.createElement(
+            'div',
+            { className: 'col-xs-5 col-md-4' },
+            _react2.default.createElement(
+              'h4',
+              null,
+              'Drawer Options'
+            )
+          )
+        ),
+        _react2.default.createElement('hr', null),
+        _react2.default.createElement(Form, {
+          ref: 'form',
+          value: this.state.defaultConfig,
+          type: formConfig,
+          options: options,
+          onChange: this.onChange.bind(this) })
+      );
+    }
+  }]);
+
+  return DrawerOptions;
+}(_react.Component);
+
+exports.default = DrawerOptions;
 
 /***/ })
 /******/ ]);

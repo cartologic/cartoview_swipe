@@ -8,6 +8,7 @@ import { default as General } from './components/General.jsx'
 import { default as MapExtent } from './components/MapExtent.jsx'
 import { default as SelectionsBox } from './components/UserSelections.jsx'
 import { default as AppAccess } from './components/Access.jsx'
+import { default as DrawerOptions } from './components/DrawerOptions.jsx'
 
 import {doGet} from './components/utils.jsx'
 
@@ -39,9 +40,6 @@ export default class editAppInstance extends React.Component {
     step: 3,
     errors: [],
     
-    profiles: undefined,
-    accessConfig: getFormValue(app_instance_config),
-
     app_instance_id: app_instance_id,
     // general step default config
     title: app_instance_title,
@@ -55,7 +53,14 @@ export default class editAppInstance extends React.Component {
     layerRight: app_instance_config.layerRight,
     
     // set extent step
-    theExtent: app_instance_config.theExtent
+    theExtent: app_instance_config.theExtent,
+
+    // access config step
+    profiles: undefined,
+    accessConfig: getFormValue(app_instance_config),
+
+    // Drawer options step
+    defaultDrawerOpen: app_instance_config.defaultDrawerOpen,
   }
 
   goToStep(step) {
@@ -115,6 +120,7 @@ export default class editAppInstance extends React.Component {
         layerRight: this.state.layerRight,
         theExtent: this.state.theExtent,
         access: this.getFormValueForSaving(this.state.accessConfig),
+        defaultDrawerOpen: this.state.defaultDrawerOpen,
       }
     }
     if (this.validateConfig(instanceConfig)) {
@@ -277,6 +283,18 @@ export default class editAppInstance extends React.Component {
             })
           }
         }
+      },
+      {
+        label: "Drawer Options",
+        component: DrawerOptions,
+        props: {
+          defaultDrawerOpen: this.state.defaultDrawerOpen,
+          onComplete: (data) => {
+            this.setState({
+              defaultDrawerOpen: data.defaultDrawerOpen,
+            })
+          },
+        },
       },
     ]
     const step = this.state.step

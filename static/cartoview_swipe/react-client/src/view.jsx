@@ -10,7 +10,7 @@ import FileSaver from 'file-saver'
 
 export default class viewAppInstance extends React.Component {
   state = {
-    leftDrawerOpen: false,
+    leftDrawerOpen: app_instance_config.defaultDrawerOpen,
     baseMapOptions: undefined,
   }
 

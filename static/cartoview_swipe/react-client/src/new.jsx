@@ -8,19 +8,16 @@ import { default as General } from './components/General.jsx'
 import { default as MapExtent } from './components/MapExtent.jsx'
 import { default as SelectionsBox } from './components/UserSelections.jsx'
 import { default as AppAccess } from './components/Access.jsx'
+import { default as DrawerOptions } from './components/DrawerOptions.jsx'
 
 import {doGet} from './components/utils.jsx'
 
 import './css/style.css'
-// import { validate } from 'tcomb-validation';
 
 export default class newAppInstance extends React.Component {
   state = {
     step: 0,
     errors: [],
-
-    profiles: undefined,
-    accessConfig: [],
 
     app_instance_id: undefined,
     // general step default config
@@ -37,6 +34,13 @@ export default class newAppInstance extends React.Component {
 
     // set extent step
     theExtent: [-16573993.717131337, -7827151.696402049, 16573993.717131337, 7827151.696402049],
+
+    // access config step
+    profiles: undefined,
+    accessConfig: [],
+
+    // Drawer Options Step
+    defaultDrawerOpen: false,
   }
 
   goToStep(step) {
@@ -115,6 +119,7 @@ export default class newAppInstance extends React.Component {
         layerRight: this.state.layerRight,
         theExtent: this.state.theExtent,
         access: this.getFormValueForSaving(this.state.accessConfig),
+        defaultDrawerOpen: this.state.defaultDrawerOpen,
       },
     }
     if (this.validateConfig(instanceConfig)) {
@@ -277,6 +282,18 @@ export default class newAppInstance extends React.Component {
             })
           }
         }
+      },
+      {
+        label: "Drawer Options",
+        component: DrawerOptions,
+        props: {
+          defaultDrawerOpen: this.state.defaultDrawerOpen,
+          onComplete: (data) => {
+            this.setState({
+              defaultDrawerOpen: data.defaultDrawerOpen,
+            })
+          },
+        },
       },
     ]
     const step = this.state.step
