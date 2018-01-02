@@ -183,7 +183,8 @@
       layersApiUrl: "/apps/{{app_name}}/api/layers/?",
       searchByTitleApiUrl: "/apps/{{app_name}}/api/layers/?typename=",
       new: "/apps/{{app_name}}/new/",
-      appInstancesPage:"{% url 'appinstance_browse' %}?app__name={{instance.app.name}}&app__title={{instance.app.title}}"
+      appInstancesPage:"{% url 'appinstance_browse' %}?app__name={{instance.app.name}}&app__title={{instance.app.title}}",
+      portalHome: site_url,
     };
 
     {% if request.user.is_authenticated %}

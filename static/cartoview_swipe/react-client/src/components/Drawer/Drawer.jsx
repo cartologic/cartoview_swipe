@@ -62,6 +62,22 @@ class CartoviewDrawer extends React.Component {
         })
     }
 
+    getRedirectURL() {
+        if (this.props.drawerOptions) {
+            switch (this.props.drawerOptions.homeButton.redirectOptions) {
+                case 'appHome':
+                  return URLS.appInstancesPage
+                  break;
+                case 'portalHome':
+                  return URLS.portalHome
+                  break;
+                case 'specificUrl':
+                  return this.props.drawerOptions.homeButton.urlText
+                  break;
+              }
+        }
+    }
+
     renderBaseMapSwitcher() {
         const classes = this.props.classes
         return (
@@ -85,7 +101,7 @@ class CartoviewDrawer extends React.Component {
         )
     }
 
-    render() {
+    render() {       
         const {
             classes,
             className,
@@ -103,12 +119,15 @@ class CartoviewDrawer extends React.Component {
                 <NavBar config={this.props.config} />
                 <Paper className={classes.drawerPaper} elevation={0}>
                     <List>
-                        <ListItem onClick={() => window.location.href = URLS.appInstancesPage} button>
-                            <ListItemIcon>
-                                <HomeIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Home" />
-                        </ListItem>
+                        {
+                            this.props.drawerOptions.homeButton.viewHomeButton && 
+                            <ListItem onClick={() => window.location.href = this.getRedirectURL()} button>
+                                <ListItemIcon>
+                                    <HomeIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Home" />
+                            </ListItem>
+                        }
                         <ListItem onClick={()=>this.handleAboutChange()} button>
                             <ListItemIcon>
                                 <InfoIcons />

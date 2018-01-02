@@ -57,6 +57,7 @@ class DrawerWithButton extends React.Component {
         </Paper>
         <Drawer
           drawerOpen={this.state.drawerOpen}
+          drawerOptions={this.props.drawerOptions}
           config={this.props.config}
           exportMap={() => { this.props.exportMap() }}
           baseMapOptions={this.props.baseMapOptions}

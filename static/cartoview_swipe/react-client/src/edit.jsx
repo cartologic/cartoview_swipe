@@ -59,8 +59,8 @@ export default class editAppInstance extends React.Component {
     profiles: undefined,
     accessConfig: getFormValue(app_instance_config),
 
-    // Drawer options step
-    defaultDrawerOpen: app_instance_config.defaultDrawerOpen,
+    // Drawer Options Step
+    drawerOptions: app_instance_config.drawerOptions,
   }
 
   goToStep(step) {
@@ -120,7 +120,7 @@ export default class editAppInstance extends React.Component {
         layerRight: this.state.layerRight,
         theExtent: this.state.theExtent,
         access: this.getFormValueForSaving(this.state.accessConfig),
-        defaultDrawerOpen: this.state.defaultDrawerOpen,
+        drawerOptions: this.state.drawerOptions,
       }
     }
     if (this.validateConfig(instanceConfig)) {
@@ -288,10 +288,10 @@ export default class editAppInstance extends React.Component {
         label: "Drawer Options",
         component: DrawerOptions,
         props: {
-          defaultDrawerOpen: this.state.defaultDrawerOpen,
+          defaultDrawerOptions: this.state.drawerOptions,
           onComplete: (data) => {
             this.setState({
-              defaultDrawerOpen: data.defaultDrawerOpen,
+              drawerOptions: data,
             })
           },
         },

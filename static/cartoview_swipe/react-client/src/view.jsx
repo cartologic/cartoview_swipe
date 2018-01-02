@@ -10,7 +10,8 @@ import FileSaver from 'file-saver'
 
 export default class viewAppInstance extends React.Component {
   state = {
-    leftDrawerOpen: app_instance_config.defaultDrawerOpen,
+    leftDrawerOpen: app_instance_config.drawerOptions.defaultDrawerOpen,
+    drawerOptions: app_instance_config.drawerOptions,
     baseMapOptions: undefined,
   }
 
@@ -218,6 +219,7 @@ export default class viewAppInstance extends React.Component {
         <LeftDrawer
           config = {{formTitle: app_instance_title, formAbstract:app_instance_abstract}}
           drawerOpen={this.state.leftDrawerOpen}
+          drawerOptions= {this.state.drawerOptions}
           handleDrawerOpen={()=>{this.setState({leftDrawerOpen: true})}}
           handleDrawerClose={() => { this.setState({ leftDrawerOpen: false }) }}
           baseMapOptions={this.state.baseMapOptions && this.state.baseMapOptions}

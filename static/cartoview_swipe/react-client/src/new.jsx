@@ -14,6 +14,36 @@ import {doGet} from './components/utils.jsx'
 
 import './css/style.css'
 
+const initialDefaultConfig = {
+  defaultDrawerOpen: false,
+  homeButton: {
+    viewHomeButton: true,
+    redirectOptions: 'appHome',
+    urlText: ""
+  }
+}
+
+import { getPropertyFromConfig, getSelectOptions } from './containers/staticMethods.jsx'
+const getFormValue = (config) => {
+  const viewAccess = getPropertyFromConfig(config ? config.access :
+    null, 'whoCanView', null)
+  const metadataAccess = getPropertyFromConfig(config ?
+    config.access : null, 'whoCanChangeMetadata',
+    null)
+  const deleteAccess = getPropertyFromConfig(config ? config.access :
+    null, 'whoCanDelete', null)
+  const changeAccess = getPropertyFromConfig(
+    config ? config.access : null,
+    'whoCanChangeConfiguration', null)
+  const value = {
+    whoCanView: viewAccess ? getSelectOptions(viewAccess) : viewAccess,
+    whoCanChangeMetadata: metadataAccess ? getSelectOptions(metadataAccess) : metadataAccess,
+    whoCanDelete: deleteAccess ? getSelectOptions(deleteAccess) : deleteAccess,
+    whoCanChangeConfiguration: changeAccess ? getSelectOptions(changeAccess) : changeAccess,
+  }
+  return value
+}
+
 export default class newAppInstance extends React.Component {
   state = {
     step: 0,
@@ -37,10 +67,10 @@ export default class newAppInstance extends React.Component {
 
     // access config step
     profiles: undefined,
-    accessConfig: [],
+    accessConfig: getFormValue(undefined),
 
     // Drawer Options Step
-    defaultDrawerOpen: false,
+    drawerOptions: initialDefaultConfig,
   }
 
   goToStep(step) {
@@ -90,26 +120,6 @@ export default class newAppInstance extends React.Component {
     return data
   }
 
-  getFormValue = (config) => {
-    const viewAccess = getPropertyFromConfig(config ? config.access :
-      null, 'whoCanView', null)
-    const metadataAccess = getPropertyFromConfig(config ?
-      config.access : null, 'whoCanChangeMetadata',
-      null)
-    const deleteAccess = getPropertyFromConfig(config ? config.access :
-      null, 'whoCanDelete', null)
-    const changeAccess = getPropertyFromConfig(
-      config ? config.access : null,
-      'whoCanChangeConfiguration', null)
-    const value = {
-      whoCanView: viewAccess ? getSelectOptions(viewAccess) : viewAccess,
-      whoCanChangeMetadata: metadataAccess ? getSelectOptions(metadataAccess) : metadataAccess,
-      whoCanDelete: deleteAccess ? getSelectOptions(deleteAccess) : deleteAccess,
-      whoCanChangeConfiguration: changeAccess ? getSelectOptions(changeAccess) : changeAccess,
-    }
-    return value
-  }
-
   saveAppInstance() {
     let instanceConfig = {
       title: this.state.title,
@@ -119,7 +129,7 @@ export default class newAppInstance extends React.Component {
         layerRight: this.state.layerRight,
         theExtent: this.state.theExtent,
         access: this.getFormValueForSaving(this.state.accessConfig),
-        defaultDrawerOpen: this.state.defaultDrawerOpen,
+        drawerOptions: this.state.drawerOptions,
       },
     }
     if (this.validateConfig(instanceConfig)) {
@@ -287,10 +297,10 @@ export default class newAppInstance extends React.Component {
         label: "Drawer Options",
         component: DrawerOptions,
         props: {
-          defaultDrawerOpen: this.state.defaultDrawerOpen,
+          defaultDrawerOptions: this.state.drawerOptions,
           onComplete: (data) => {
             this.setState({
-              defaultDrawerOpen: data.defaultDrawerOpen,
+              drawerOptions: data,
             })
           },
         },
