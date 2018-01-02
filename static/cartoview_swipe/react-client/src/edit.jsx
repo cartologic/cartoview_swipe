@@ -6,14 +6,41 @@ import { default as WizardSteper } from './components/EditModeNavigator.jsx'
 import { default as ResourceSelector } from './components/ResourceSelector.jsx'
 import { default as General } from './components/General.jsx'
 import { default as MapExtent } from './components/MapExtent.jsx'
-import {default as SelectionsBox} from './components/UserSelections.jsx'
+import { default as SelectionsBox } from './components/UserSelections.jsx'
+import { default as AppAccess } from './components/Access.jsx'
+
+import {doGet} from './components/utils.jsx'
 
 import './css/style.css'
+
+import { getPropertyFromConfig, getSelectOptions } from './containers/staticMethods.jsx'
+const getFormValue = (config) => {
+  const viewAccess = getPropertyFromConfig(config ? config.access :
+    null, 'whoCanView', null)
+  const metadataAccess = getPropertyFromConfig(config ?
+    config.access : null, 'whoCanChangeMetadata',
+    null)
+  const deleteAccess = getPropertyFromConfig(config ? config.access :
+    null, 'whoCanDelete', null)
+  const changeAccess = getPropertyFromConfig(
+    config ? config.access : null,
+    'whoCanChangeConfiguration', null)
+  const value = {
+    whoCanView: viewAccess ? getSelectOptions(viewAccess) : viewAccess,
+    whoCanChangeMetadata: metadataAccess ? getSelectOptions(metadataAccess) : metadataAccess,
+    whoCanDelete: deleteAccess ? getSelectOptions(deleteAccess) : deleteAccess,
+    whoCanChangeConfiguration: changeAccess ? getSelectOptions(changeAccess) : changeAccess,
+  }
+  return value
+}
 
 export default class editAppInstance extends React.Component {
   state = {
     step: 3,
     errors: [],
+    
+    profiles: undefined,
+    accessConfig: getFormValue(app_instance_config),
 
     app_instance_id: app_instance_id,
     // general step default config
@@ -52,6 +79,32 @@ export default class editAppInstance extends React.Component {
     return false
   }
 
+  getProfiles = () => {
+    const url = URLS.profilesAPI
+    doGet(url).then(result => {
+      this.setState({
+        profiles: result.objects,
+      })
+    })
+  }
+
+  componentDidMount() {
+    this.getProfiles();
+  }
+
+  flattenedUsers = (users) => {
+    return users.map(obj => obj.value)
+  }
+
+  getFormValueForSaving = (value) => {
+    let data = {}
+    Object.keys(value).map(attr => {
+      const attributeValue = value[attr]
+      data[attr] = attributeValue ? this.flattenedUsers(attributeValue) : null
+    })
+    return data
+  }
+
   saveAppInstance() {
     let instanceConfig = {
       title: this.state.title,
@@ -60,7 +113,8 @@ export default class editAppInstance extends React.Component {
         access: this.state.access,
         layerLeft: this.state.layerLeft,
         layerRight: this.state.layerRight,
-        theExtent: this.state.theExtent
+        theExtent: this.state.theExtent,
+        access: this.getFormValueForSaving(this.state.accessConfig),
       }
     }
     if (this.validateConfig(instanceConfig)) {
@@ -203,6 +257,23 @@ export default class editAppInstance extends React.Component {
           save: (theExtent) => {
             this.setState({ theExtent: theExtent, savingIndicator: true }, () => {
               this.saveAppInstance()
+            })
+          }
+        }
+      },
+      {
+        label: "Access Configuration",
+        title: "Acccess Configuration",
+        component: AppAccess,
+        ref: 'accessConfigurationStep',
+        // hasErrors: false,
+        props: {
+          loading: this.state.savingIndicator,
+          config: this.state.accessConfig,
+          profiles: this.state.profiles,
+          onComplete: (data) => {
+            this.setState({
+              accessConfig: data
             })
           }
         }

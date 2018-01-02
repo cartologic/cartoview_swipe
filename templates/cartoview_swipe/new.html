@@ -43,6 +43,7 @@
           layersApiUrl: "/apps/{{app_name}}/api/layers/?",
           searchByTitleApiUrl: "/apps/{{app_name}}/api/layers/?typename=",
           new: "/apps/{{app_name}}/new/",
+          profilesAPI: "{% url 'api_dispatch_list' api_name='api' resource_name='profiles' %}",
         };
         
         {% if request.user.is_authenticated %}

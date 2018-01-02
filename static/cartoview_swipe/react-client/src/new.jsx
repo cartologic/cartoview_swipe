@@ -6,15 +6,21 @@ import { default as WizardSteper } from './components/EditModeNavigator.jsx'
 import { default as ResourceSelector } from './components/ResourceSelector.jsx'
 import { default as General } from './components/General.jsx'
 import { default as MapExtent } from './components/MapExtent.jsx'
-import {default as SelectionsBox} from './components/UserSelections.jsx'
+import { default as SelectionsBox } from './components/UserSelections.jsx'
+import { default as AppAccess } from './components/Access.jsx'
+
+import {doGet} from './components/utils.jsx'
 
 import './css/style.css'
-import { validate } from 'tcomb-validation';
+// import { validate } from 'tcomb-validation';
 
 export default class newAppInstance extends React.Component {
   state = {
     step: 0,
     errors: [],
+
+    profiles: undefined,
+    accessConfig: [],
 
     app_instance_id: undefined,
     // general step default config
@@ -54,16 +60,62 @@ export default class newAppInstance extends React.Component {
     return false
   }
 
+  getProfiles = () => {
+    const url = URLS.profilesAPI
+    doGet(url).then(result => {
+      this.setState({
+        profiles: result.objects,
+      })
+    })
+  }
+
+  componentDidMount() {
+    this.getProfiles();
+  }
+
+  flattenedUsers = (users) => {
+    return users.map(obj => obj.value)
+  }
+
+  getFormValueForSaving = (value) => {
+    let data = {}
+    Object.keys(value).map(attr => {
+      const attributeValue = value[attr]
+      data[attr] = attributeValue ? this.flattenedUsers(attributeValue) : null
+    })
+    return data
+  }
+
+  getFormValue = (config) => {
+    const viewAccess = getPropertyFromConfig(config ? config.access :
+      null, 'whoCanView', null)
+    const metadataAccess = getPropertyFromConfig(config ?
+      config.access : null, 'whoCanChangeMetadata',
+      null)
+    const deleteAccess = getPropertyFromConfig(config ? config.access :
+      null, 'whoCanDelete', null)
+    const changeAccess = getPropertyFromConfig(
+      config ? config.access : null,
+      'whoCanChangeConfiguration', null)
+    const value = {
+      whoCanView: viewAccess ? getSelectOptions(viewAccess) : viewAccess,
+      whoCanChangeMetadata: metadataAccess ? getSelectOptions(metadataAccess) : metadataAccess,
+      whoCanDelete: deleteAccess ? getSelectOptions(deleteAccess) : deleteAccess,
+      whoCanChangeConfiguration: changeAccess ? getSelectOptions(changeAccess) : changeAccess,
+    }
+    return value
+  }
+
   saveAppInstance() {
     let instanceConfig = {
       title: this.state.title,
       abstract: this.state.abstract,
       config: {
-        access: this.state.access,
         layerLeft: this.state.layerLeft,
         layerRight: this.state.layerRight,
-        theExtent: this.state.theExtent
-      }
+        theExtent: this.state.theExtent,
+        access: this.getFormValueForSaving(this.state.accessConfig),
+      },
     }
     if (this.validateConfig(instanceConfig)) {
       let url = URLS.new;
@@ -129,8 +181,7 @@ export default class newAppInstance extends React.Component {
   }
 
   render() {
-    const steps = [
-      {
+    const steps = [{
         label: "General",
         component: General,
         props: {
@@ -147,7 +198,7 @@ export default class newAppInstance extends React.Component {
           stepForward: () => {
             this.goToStep(this.state.step + 1)
           },
-          error: this.state.errors.indexOf(0) !== -1 
+          error: this.state.errors.indexOf(0) !== -1
         },
       },
       {
@@ -159,7 +210,9 @@ export default class newAppInstance extends React.Component {
           title: 'Select Left Layer',
           selectedResource: this.state.layerLeft,
           onComplete: (layer) => {
-            this.setState({layerLeft: layer})
+            this.setState({
+              layerLeft: layer
+            })
           },
           stepBack: () => {
             this.goToStep(this.state.step - 1)
@@ -178,7 +231,9 @@ export default class newAppInstance extends React.Component {
           title: 'Select Right Layer',
           selectedResource: this.state.layerRight,
           onComplete: (layer) => {
-            this.setState({layerRight: layer})
+            this.setState({
+              layerRight: layer
+            })
           },
           stepBack: () => {
             this.goToStep(this.state.step - 1)
@@ -200,8 +255,27 @@ export default class newAppInstance extends React.Component {
             this.goToStep(this.state.step - 1)
           },
           onComplete: (theExtent) => {
-            this.setState({theExtent:theExtent})
+            this.setState({
+              theExtent: theExtent
+            })
           },
+        }
+      },
+      {
+        label: "Access Configuration",
+        title: "Acccess Configuration",
+        component: AppAccess,
+        ref: 'accessConfigurationStep',
+        hasErrors: false,
+        props: {
+          loading: this.state.savingIndicator,
+          config: this.state.accessConfig,
+          profiles: this.state.profiles,
+          onComplete: (data) => {
+            this.setState({
+              accessConfig: data
+            })
+          }
         }
       },
     ]
