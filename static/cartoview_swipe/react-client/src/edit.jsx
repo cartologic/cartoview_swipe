@@ -9,6 +9,7 @@ import { default as MapExtent } from './components/MapExtent.jsx'
 import { default as SelectionsBox } from './components/UserSelections.jsx'
 import { default as AppAccess } from './components/Access.jsx'
 import { default as DrawerOptions } from './components/DrawerOptions.jsx'
+import { default as MapOptions } from './components/MapOptions.jsx'
 
 import {doGet} from './components/utils.jsx'
 
@@ -61,6 +62,9 @@ export default class editAppInstance extends React.Component {
 
     // Drawer Options Step
     drawerOptions: app_instance_config.drawerOptions,
+
+    // Map Options Step
+    mapOptions: app_instance_config.mapOptions,
   }
 
   goToStep(step) {
@@ -121,6 +125,7 @@ export default class editAppInstance extends React.Component {
         theExtent: this.state.theExtent,
         access: this.getFormValueForSaving(this.state.accessConfig),
         drawerOptions: this.state.drawerOptions,
+        mapOptions: this.state.mapOptions,
       }
     }
     if (this.validateConfig(instanceConfig)) {
@@ -292,6 +297,18 @@ export default class editAppInstance extends React.Component {
           onComplete: (data) => {
             this.setState({
               drawerOptions: data,
+            })
+          },
+        },
+      },
+      {
+        label: "Map Options",
+        component: MapOptions,
+        props: {
+          defaultMapOptions: this.state.mapOptions,
+          onComplete: (data) => {
+            this.setState({
+              mapOptions: data,
             })
           },
         },

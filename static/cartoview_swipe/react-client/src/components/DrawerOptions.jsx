@@ -32,7 +32,6 @@ export default class DrawerOptions extends Component {
 
   getFormOptions() {
     const defaultConfig = this.state.defaultConfig;
-    console.log()
     const options = {
       fields: {
         defaultDrawerOpen: {

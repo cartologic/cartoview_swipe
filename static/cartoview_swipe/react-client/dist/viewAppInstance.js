@@ -38350,7 +38350,10 @@ var viewAppInstance = function (_React$Component) {
     value: function componentDidMount() {
       this.getBaseMaps();
       this.serveMap();
-      this.singleClickListner();
+
+      if (app_instance_config.mapOptions.enableIdentify) {
+        this.singleClickListner();
+      }
 
       this.overlay = new _openlayers2.default.Overlay({
         autoPan: true

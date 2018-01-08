@@ -287,7 +287,10 @@ export default class viewAppInstance extends React.Component {
   componentDidMount() {
     this.getBaseMaps()
     this.serveMap()
-    this.singleClickListner()
+
+    if (app_instance_config.mapOptions.enableIdentify) {
+      this.singleClickListner()
+    }
 
     this.overlay = new ol.Overlay({
       autoPan: true,
