@@ -3,7 +3,15 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import './css/style.css'
 
-import {default as LeftDrawer} from './components/Drawer/DrawerWithButton.jsx'
+import LayersHelper from './components/helpers/LayersHelper.jsx'
+import FeaturesHelper from './components/helpers/FeaturesHelper.jsx'
+import BasicViewerHelper from './components/helpers/BasicViewerHelper.jsx'
+import Animation from './components/helpers/AnimationHelper.jsx'
+
+import { default as LeftDrawer } from './components/Drawer/DrawerWithButton.jsx'
+import CartoviewSnackBar from './components/CartoviewSnakeBar.jsx'
+import CartoviewPopup from './components/PopUp.jsx'
+
 import ol from 'openlayers'
 
 import FileSaver from 'file-saver'
@@ -13,6 +21,13 @@ export default class viewAppInstance extends React.Component {
     leftDrawerOpen: app_instance_config.drawerOptions.defaultDrawerOpen,
     drawerOptions: app_instance_config.drawerOptions,
     baseMapOptions: undefined,
+
+    featureCollection: new ol.Collection(),
+    featureIdentifyResult: [],
+    featureIdentifyLoading: false,
+    showPopup: false,
+    activeFeature: 0,
+    mouseCoordinates: [ 0, 0 ],
   }
 
   serveMap() {
@@ -36,6 +51,7 @@ export default class viewAppInstance extends React.Component {
       })
     })
     layerRight.set('name', 'layerRight')
+    layerRight.set('title', layerRightTitle)
 
     var layerLeft = new ol.layer.Tile({
       source: new ol.source.TileWMS({
@@ -52,6 +68,7 @@ export default class viewAppInstance extends React.Component {
       })
     })
     layerLeft.set('name', 'layerLeft')
+    layerLeft.set('title', layerLeftTitle)    
   
     this.map = new ol.Map({
       layers: [backgroundBaseMaps, layerLeft, layerRight,],
@@ -90,9 +107,6 @@ export default class viewAppInstance extends React.Component {
     swipe.addEventListener('input', function () {
       _map.render();
     }, false);
-
-    // this.map.getLayers().getArray()[0].getLayers().getArray()[0].setVisible(true)
-    // console.log(this.map.getLayers().getArray()[0].getLayers().getArray()[0].get('name'))
   }
 
   setLayerOpacity(layer, opacity) {
@@ -153,9 +167,132 @@ export default class viewAppInstance extends React.Component {
     })
   }
 
+  resetFeatureCollection = () => {
+    let {
+      featureCollection
+    } = this.state
+    featureCollection.clear()
+  }
+
+  addStyleToFeature = (features) => {
+    let {
+      featureCollection
+    } = this.state
+    this.resetFeatureCollection()
+    if (features && features.length > 0) {
+      featureCollection.extend(features)
+    }
+  }
+
+  zoomToFeature = (feature) => {
+    let map = this.map
+    this.addStyleToFeature([feature])
+    const featureCenter = feature.getGeometry().getExtent()
+    const center = BasicViewerHelper.getCenterOfExtent(featureCenter)
+    Animation.flyTo(center, map.getView(), 14, () => {})
+  }
+
+  addOverlay = (node) => {
+    const {
+      activeFeature,
+      featureIdentifyResult,
+      mouseCoordinates
+    } = this.state
+
+    let position = mouseCoordinates
+
+    if (featureIdentifyResult.length > 0) {
+      const currentFeature = featureIdentifyResult[activeFeature]
+      const featureExtent = currentFeature.getGeometry().getExtent()
+      position = BasicViewerHelper.getCenterOfExtent(featureExtent)
+    }
+
+    this.overlay.setElement(node)
+    this.overlay.setPosition(position)
+  }
+
+  featureIdentify = (map, coordinate) => {
+    const view = map.getView()
+    let identifyPromises = LayersHelper.getLayers(map.getLayers().getArray())
+      .map(
+        (layer) => FeaturesHelper.readFeaturesThenTransform(
+        this.urls, layer, coordinate, view, map))
+    Promise.all(identifyPromises).then(result => {
+      const featureIdentifyResult = result.reduce((array1,
+        array2) => array1.concat(array2), [])
+      this.setState({
+        featureIdentifyLoading: false,
+        featureIdentifyResult,
+        activeFeature: 0,
+        showPopup: true
+      }, () => this.addStyleToFeature(
+        featureIdentifyResult))
+    })
+  }
+
+  singleClickListner = () => {
+    let map = this.map
+    map.on('singleclick', (e) => {
+      if (this.overlay) {
+        this.overlay.setElement(undefined)
+      }
+      this.setState({
+        mouseCoordinates: e.coordinate,
+        featureIdentifyLoading: true,
+        activeFeature: 0,
+        featureIdentifyResult: [],
+        showPopup: false
+      })
+      this.featureIdentify(map, e.coordinate)
+    })
+  }
+
+  changeShowPopup = () => {
+    const {
+      showPopup
+    } = this.state
+    this.setState({
+      showPopup: !showPopup
+    })
+  }
+
+  addStyleToCurrentFeature = () => {
+    const {
+      activeFeature,
+      featureIdentifyResult
+    } = this.state
+    this.addStyleToFeature([featureIdentifyResult[activeFeature]])
+  }
+
+  nextFeature = () => {
+    const {
+      activeFeature
+    } = this.state
+    const nextIndex = activeFeature + 1
+    this.setState({
+      activeFeature: nextIndex
+    }, this.addStyleToCurrentFeature)
+  }
+
+  previousFeature = () => {
+    const {
+      activeFeature
+    } = this.state
+    const previuosIndex = activeFeature - 1
+    this.setState({
+      activeFeature: previuosIndex
+    }, this.addStyleToCurrentFeature)
+  }
+
   componentDidMount() {
     this.getBaseMaps()
     this.serveMap()
+    this.singleClickListner()
+
+    this.overlay = new ol.Overlay({
+      autoPan: true,
+    })
+    this.map.addOverlay(this.overlay)
   }
 
   exportMap(map) {
@@ -197,6 +334,19 @@ export default class viewAppInstance extends React.Component {
   }
 
   render() {
+    const childrenProps = {
+      resetFeatureCollection: this.resetFeatureCollection,
+      zoomToFeature: this.zoomToFeature,
+      addOverlay: this.addOverlay,
+      changeShowPopup: this.changeShowPopup,
+      addStyleToFeature: this.addStyleToFeature,
+      nextFeature: this.nextFeature,
+      previousFeature: this.previousFeature,
+
+      ...this.state,
+
+      map: this.map
+    }
     return (
       <div>
         <div
@@ -209,7 +359,15 @@ export default class viewAppInstance extends React.Component {
           type="range"
           ref={(input) => { this.rangeInput = input; }}
           />
-        </div>     
+        </div>
+        
+        {
+          this.map && 
+          <CartoviewPopup {...childrenProps} />
+        }
+
+        <CartoviewSnackBar open={childrenProps.featureIdentifyLoading} message={"Searching For Features at this Point"} />
+        
         <LeftDrawer
           config = {{formTitle: app_instance_title, formAbstract:app_instance_abstract}}
           drawerOpen={this.state.leftDrawerOpen}
