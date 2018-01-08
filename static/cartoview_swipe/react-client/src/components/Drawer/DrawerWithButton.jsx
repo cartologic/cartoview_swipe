@@ -60,6 +60,7 @@ class DrawerWithButton extends React.Component {
           drawerOptions={this.props.drawerOptions}
           config={this.props.config}
           exportMap={() => { this.props.exportMap() }}
+          setLayerOpacity={(layer, opacity)=>{this.props.setLayerOpacity(layer, opacity)}}
           baseMapOptions={this.props.baseMapOptions}
           setBaseMap = {(currentBaseMap, previousBaseMap)=>{this.props.setBaseMap(currentBaseMap, previousBaseMap)}}
         />

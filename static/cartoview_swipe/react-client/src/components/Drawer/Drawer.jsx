@@ -35,12 +35,28 @@ const styles = theme => ( {
     drawerPaper: {
         // position: 'fixed',
         width: '300px'
+    },
+    expansionPanelDetails: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center'
+    },
+    layerOpcity: {
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        paddingBottom: '15px',
     }
 } )
 class CartoviewDrawer extends React.Component {
     state = {
         drawerOpen: this.props.drawerOpen,
         about: false,
+
+        layerLeftOpacity: 1,
+        layerRightOpacity: 1,
+
         baseMapRadioValue: 'OSMBaseMap'
     }
 
@@ -62,6 +78,16 @@ class CartoviewDrawer extends React.Component {
         })
     }
 
+    handleOpacityChange(layer, value) {
+        this.setState(
+            {[`${layer}Opacity`]: value},
+            () => {
+                // console.log(`${layer}Opacity Changed`, this.state[`${layer}Opacity`])
+                this.props.setLayerOpacity(layer, value)
+            }
+        )
+    }
+
     getRedirectURL() {
         if (this.props.drawerOptions) {
             switch (this.props.drawerOptions.homeButton.redirectOptions) {
@@ -78,12 +104,33 @@ class CartoviewDrawer extends React.Component {
         }
     }
 
+    renderLayersOpacitySlider() {
+        const classes = this.props.classes
+        return (
+            <ExpansionPanel>
+                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography type="subheading">Layer Opacity</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails className={classes.expansionPanelDetails}>
+                    <div className={classes.layerOpcity + ' layer-opacity-slider'}>
+                        <Typography type="body1">{`${layerLeftTitle}`}</Typography>
+                        <input type="range" onChange={(e) => { this.handleOpacityChange('layerLeft', e.target.value) }} value={this.state.layerLeftOpacity} min={0} max={0.99} step={0.01} />
+                    </div>
+                    <div className={classes.layerOpcity + ' layer-opacity-slider'}>
+                        <Typography type="body1">{`${layerRightTitle}`}</Typography>
+                        <input type="range" onChange={(e) => { this.handleOpacityChange('layerRight', e.target.value) }} value={this.state.layerRightOpacity} min={0} max={0.99} step={0.01} />
+                    </div>    
+                </ExpansionPanelDetails>
+            </ExpansionPanel>
+        )
+    }
+
     renderBaseMapSwitcher() {
         const classes = this.props.classes
         return (
             <ExpansionPanel>
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography className={classes.heading}>Base Map Layer Switcher</Typography>
+                <Typography type="subheading">Base Map Layer Switcher</Typography>
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
                     <RadioGroup aria-label="gender" name="gender1" className={classes.group} value={this.state.baseMapRadioValue} onChange={this.handleRadioChange.bind(this)}>                    
@@ -140,6 +187,7 @@ class CartoviewDrawer extends React.Component {
                             </ListItemIcon>
                             <ListItemText primary="Export Map" />
                         </ListItem>
+                        {this.renderLayersOpacitySlider()}
                         {this.renderBaseMapSwitcher()}
                         <CartoviewAbout
                             open={this.state.about}

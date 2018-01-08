@@ -110,10 +110,95 @@
     input[type=range]:focus::-ms-fill-upper {
       background: #367ebd;
     }
-
-
-
     /* end of input type range */
+
+    /* layer Opacity input */
+    .layer-opacity-slider input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      margin: 3.5px 0;
+    }
+    .layer-opacity-slider input[type=range]:focus {
+      outline: none;
+    }
+    .layer-opacity-slider input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 3px;
+      cursor: pointer;
+      box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+      background: #3071a9;
+      border-radius: 1.3px;
+      border: 0px solid #010101;
+    }
+    .layer-opacity-slider input[type=range]::-webkit-slider-thumb {
+      box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+      border: 1px solid #000000;
+      height: 10px;
+      width: 10px;
+      border-radius: 50px;
+      background: #ffffff;
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -3.5px;
+    }
+    .layer-opacity-slider input[type=range]:focus::-webkit-slider-runnable-track {
+      background: #3276b1;
+    }
+    .layer-opacity-slider input[type=range]::-moz-range-track {
+      width: 100%;
+      height: 3px;
+      cursor: pointer;
+      box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+      background: #3071a9;
+      border-radius: 1.3px;
+      border: 0px solid #010101;
+    }
+    .layer-opacity-slider input[type=range]::-moz-range-thumb {
+      box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+      border: 1px solid #000000;
+      height: 10px;
+      width: 10px;
+      border-radius: 50px;
+      background: #ffffff;
+      cursor: pointer;
+    }
+    .layer-opacity-slider input[type=range]::-ms-track {
+      width: 100%;
+      height: 3px;
+      cursor: pointer;
+      background: transparent;
+      border-color: transparent;
+      color: transparent;
+    }
+    .layer-opacity-slider input[type=range]::-ms-fill-lower {
+      background: #2e6ca1;
+      border: 0px solid #010101;
+      border-radius: 2.6px;
+      box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+    }
+    .layer-opacity-slider input[type=range]::-ms-fill-upper {
+      background: #3071a9;
+      border: 0px solid #010101;
+      border-radius: 2.6px;
+      box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+    }
+    .layer-opacity-slider input[type=range]::-ms-thumb {
+      box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+      border: 1px solid #000000;
+      height: 10px;
+      width: 10px;
+      border-radius: 50px;
+      background: #ffffff;
+      cursor: pointer;
+      height: 3px;
+    }
+    .layer-opacity-slider input[type=range]:focus::-ms-fill-lower {
+      background: #3071a9;
+    }
+    .layer-opacity-slider input[type=range]:focus::-ms-fill-upper {
+      background: #3276b1;
+    }
+    /* end of  layer Opacity input */
 
     #map {
       width: 100%;
@@ -169,6 +254,8 @@
     const app_instance_abstract = String(`{{instance.abstract}}`)
     const layerLeftName = app_instance_config.layerLeft.typename;
     const layerRightName = app_instance_config.layerRight.typename;
+    const layerLeftTitle = app_instance_config.layerLeft.title;
+    const layerRightTitle = app_instance_config.layerRight.title;
     const theExtent = app_instance_config.theExtent;
 
     {% if PROXY_URL %}

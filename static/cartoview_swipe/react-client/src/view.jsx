@@ -23,7 +23,7 @@ export default class viewAppInstance extends React.Component {
 
     var layerRight = new ol.layer.Tile({
       source: new ol.source.TileWMS({
-        url: URLS.geoserver+'wms',
+        url: URLS.geoserver + 'wms',
         params: {
           'LAYERS': layerRightName,
           'TILED': true
@@ -35,10 +35,11 @@ export default class viewAppInstance extends React.Component {
         }
       })
     })
+    layerRight.set('name', 'layerRight')
 
     var layerLeft = new ol.layer.Tile({
       source: new ol.source.TileWMS({
-        url: URLS.geoserver+'wms',
+        url: URLS.geoserver + 'wms',
         params: {
           'LAYERS': layerLeftName,
           'TILED': true
@@ -50,22 +51,7 @@ export default class viewAppInstance extends React.Component {
         }
       })
     })
-  
-
-    // var layerLeft = new ol.layer.Tile({
-    //   source: new ol.source.TileWMS({
-    //     url: URLS.geoserver+'wms',
-    //     params: {
-    //       'LAYERS': layerLeftName,
-    //       'TILED': true
-    //     },
-    //     serverType: 'geoserver',
-    //     transition: 0,
-    //     tileLoadFunction:function(imageTile, src) {
-    //       imageTile.getImage().src = `${URLS.proxy !== null ? URLS.proxy : ''}`+encodeURIComponent(src).replace(/%20/g, '+');
-    //     }
-    //   })
-    // });
+    layerLeft.set('name', 'layerLeft')
   
     this.map = new ol.Map({
       layers: [backgroundBaseMaps, layerLeft, layerRight,],
@@ -107,6 +93,14 @@ export default class viewAppInstance extends React.Component {
 
     // this.map.getLayers().getArray()[0].getLayers().getArray()[0].setVisible(true)
     // console.log(this.map.getLayers().getArray()[0].getLayers().getArray()[0].get('name'))
+  }
+
+  setLayerOpacity(layer, opacity) {
+    this.map.getLayers().getArray().filter(l => {
+      if (l.get('name') === layer) {
+        l.setOpacity(opacity)
+      }
+    })
   }
 
   getBaseMaps() {
@@ -222,6 +216,7 @@ export default class viewAppInstance extends React.Component {
           drawerOptions= {this.state.drawerOptions}
           handleDrawerOpen={()=>{this.setState({leftDrawerOpen: true})}}
           handleDrawerClose={() => { this.setState({ leftDrawerOpen: false }) }}
+          setLayerOpacity={(layer, opacity)=>{this.setLayerOpacity(layer, opacity)}}
           baseMapOptions={this.state.baseMapOptions && this.state.baseMapOptions}
           setBaseMap = {(currentBaseMap, previousBaseMap)=>{this.setBaseMap(currentBaseMap, previousBaseMap)}}
           exportMap = {()=>{this.exportMap(this.map)}}

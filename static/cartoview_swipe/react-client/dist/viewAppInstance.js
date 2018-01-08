@@ -26874,6 +26874,7 @@ var viewAppInstance = function (_React$Component) {
           }
         })
       });
+      layerRight.set('name', 'layerRight');
 
       var layerLeft = new _openlayers2.default.layer.Tile({
         source: new _openlayers2.default.source.TileWMS({
@@ -26889,21 +26890,7 @@ var viewAppInstance = function (_React$Component) {
           }
         })
       });
-
-      // var layerLeft = new ol.layer.Tile({
-      //   source: new ol.source.TileWMS({
-      //     url: URLS.geoserver+'wms',
-      //     params: {
-      //       'LAYERS': layerLeftName,
-      //       'TILED': true
-      //     },
-      //     serverType: 'geoserver',
-      //     transition: 0,
-      //     tileLoadFunction:function(imageTile, src) {
-      //       imageTile.getImage().src = `${URLS.proxy !== null ? URLS.proxy : ''}`+encodeURIComponent(src).replace(/%20/g, '+');
-      //     }
-      //   })
-      // });
+      layerLeft.set('name', 'layerLeft');
 
       this.map = new _openlayers2.default.Map({
         layers: [backgroundBaseMaps, layerLeft, layerRight],
@@ -26945,6 +26932,15 @@ var viewAppInstance = function (_React$Component) {
 
       // this.map.getLayers().getArray()[0].getLayers().getArray()[0].setVisible(true)
       // console.log(this.map.getLayers().getArray()[0].getLayers().getArray()[0].get('name'))
+    }
+  }, {
+    key: 'setLayerOpacity',
+    value: function setLayerOpacity(layer, opacity) {
+      this.map.getLayers().getArray().filter(function (l) {
+        if (l.get('name') === layer) {
+          l.setOpacity(opacity);
+        }
+      });
     }
   }, {
     key: 'getBaseMaps',
@@ -27078,6 +27074,9 @@ var viewAppInstance = function (_React$Component) {
           },
           handleDrawerClose: function handleDrawerClose() {
             _this4.setState({ leftDrawerOpen: false });
+          },
+          setLayerOpacity: function setLayerOpacity(layer, opacity) {
+            _this4.setLayerOpacity(layer, opacity);
           },
           baseMapOptions: this.state.baseMapOptions && this.state.baseMapOptions,
           setBaseMap: function setBaseMap(currentBaseMap, previousBaseMap) {
@@ -27234,6 +27233,9 @@ var DrawerWithButton = function (_React$Component) {
           config: this.props.config,
           exportMap: function exportMap() {
             _this2.props.exportMap();
+          },
+          setLayerOpacity: function setLayerOpacity(layer, opacity) {
+            _this2.props.setLayerOpacity(layer, opacity);
           },
           baseMapOptions: this.props.baseMapOptions,
           setBaseMap: function setBaseMap(currentBaseMap, previousBaseMap) {
@@ -34778,6 +34780,8 @@ var _About2 = _interopRequireDefault(_About);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -34798,6 +34802,18 @@ var styles = function styles(theme) {
         drawerPaper: {
             // position: 'fixed',
             width: '300px'
+        },
+        expansionPanelDetails: {
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center'
+        },
+        layerOpcity: {
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            paddingBottom: '15px'
         }
     };
 };
@@ -34819,6 +34835,10 @@ var CartoviewDrawer = function (_React$Component) {
         return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = CartoviewDrawer.__proto__ || Object.getPrototypeOf(CartoviewDrawer)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
             drawerOpen: _this.props.drawerOpen,
             about: false,
+
+            layerLeftOpacity: 1,
+            layerRightOpacity: 1,
+
             baseMapRadioValue: 'OSMBaseMap'
         }, _this.handleAboutChange = function () {
             var about = _this.state.about;
@@ -34845,6 +34865,16 @@ var CartoviewDrawer = function (_React$Component) {
             });
         }
     }, {
+        key: 'handleOpacityChange',
+        value: function handleOpacityChange(layer, value) {
+            var _this3 = this;
+
+            this.setState(_defineProperty({}, layer + 'Opacity', value), function () {
+                // console.log(`${layer}Opacity Changed`, this.state[`${layer}Opacity`])
+                _this3.props.setLayerOpacity(layer, value);
+            });
+        }
+    }, {
         key: 'getRedirectURL',
         value: function getRedirectURL() {
             if (this.props.drawerOptions) {
@@ -34862,6 +34892,54 @@ var CartoviewDrawer = function (_React$Component) {
             }
         }
     }, {
+        key: 'renderLayersOpacitySlider',
+        value: function renderLayersOpacitySlider() {
+            var _this4 = this;
+
+            var classes = this.props.classes;
+            return _react2.default.createElement(
+                _ExpansionPanel2.default,
+                null,
+                _react2.default.createElement(
+                    _ExpansionPanel.ExpansionPanelSummary,
+                    { expandIcon: _react2.default.createElement(_ExpandMore2.default, null) },
+                    _react2.default.createElement(
+                        _Typography2.default,
+                        { type: 'subheading' },
+                        'Layer Opacity'
+                    )
+                ),
+                _react2.default.createElement(
+                    _ExpansionPanel.ExpansionPanelDetails,
+                    { className: classes.expansionPanelDetails },
+                    _react2.default.createElement(
+                        'div',
+                        { className: classes.layerOpcity + ' layer-opacity-slider' },
+                        _react2.default.createElement(
+                            _Typography2.default,
+                            { type: 'body1' },
+                            '' + layerLeftTitle
+                        ),
+                        _react2.default.createElement('input', { type: 'range', onChange: function onChange(e) {
+                                _this4.handleOpacityChange('layerLeft', e.target.value);
+                            }, value: this.state.layerLeftOpacity, min: 0, max: 0.99, step: 0.01 })
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: classes.layerOpcity + ' layer-opacity-slider' },
+                        _react2.default.createElement(
+                            _Typography2.default,
+                            { type: 'body1' },
+                            '' + layerRightTitle
+                        ),
+                        _react2.default.createElement('input', { type: 'range', onChange: function onChange(e) {
+                                _this4.handleOpacityChange('layerRight', e.target.value);
+                            }, value: this.state.layerRightOpacity, min: 0, max: 0.99, step: 0.01 })
+                    )
+                )
+            );
+        }
+    }, {
         key: 'renderBaseMapSwitcher',
         value: function renderBaseMapSwitcher() {
             var classes = this.props.classes;
@@ -34873,7 +34951,7 @@ var CartoviewDrawer = function (_React$Component) {
                     { expandIcon: _react2.default.createElement(_ExpandMore2.default, null) },
                     _react2.default.createElement(
                         _Typography2.default,
-                        { className: classes.heading },
+                        { type: 'subheading' },
                         'Base Map Layer Switcher'
                     )
                 ),
@@ -34893,7 +34971,7 @@ var CartoviewDrawer = function (_React$Component) {
     }, {
         key: 'render',
         value: function render() {
-            var _this3 = this;
+            var _this5 = this;
 
             var _props = this.props,
                 classes = _props.classes,
@@ -34915,7 +34993,7 @@ var CartoviewDrawer = function (_React$Component) {
                         this.props.drawerOptions.homeButton.viewHomeButton && _react2.default.createElement(
                             _List.ListItem,
                             { onClick: function onClick() {
-                                    return window.location.href = _this3.getRedirectURL();
+                                    return window.location.href = _this5.getRedirectURL();
                                 }, button: true },
                             _react2.default.createElement(
                                 _List.ListItemIcon,
@@ -34927,7 +35005,7 @@ var CartoviewDrawer = function (_React$Component) {
                         _react2.default.createElement(
                             _List.ListItem,
                             { onClick: function onClick() {
-                                    return _this3.handleAboutChange();
+                                    return _this5.handleAboutChange();
                                 }, button: true },
                             _react2.default.createElement(
                                 _List.ListItemIcon,
@@ -34939,7 +35017,7 @@ var CartoviewDrawer = function (_React$Component) {
                         _react2.default.createElement(
                             _List.ListItem,
                             { onClick: function onClick() {
-                                    _this3.props.exportMap();
+                                    _this5.props.exportMap();
                                 }, button: true },
                             _react2.default.createElement(
                                 _List.ListItemIcon,
@@ -34948,13 +35026,14 @@ var CartoviewDrawer = function (_React$Component) {
                             ),
                             _react2.default.createElement(_List.ListItemText, { primary: 'Export Map' })
                         ),
+                        this.renderLayersOpacitySlider(),
                         this.renderBaseMapSwitcher(),
                         _react2.default.createElement(_About2.default, {
                             open: this.state.about,
                             title: config.formTitle,
                             abstract: config.formAbstract,
                             close: function close() {
-                                _this3.handleAboutChange();
+                                _this5.handleAboutChange();
                             } })
                     )
                 )
