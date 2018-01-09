@@ -1,10 +1,8 @@
 import React, {Component} from 'react';
 import t from 'tcomb-form';
 
-const Access = t.enums({
-  public: 'Public', private: 'Private (only me)',
-});
-const formConfig = t.struct({title: t.String, abstract: t.maybe(t.String), access: Access});
+
+const formConfig = t.struct({title: t.String, abstract: t.maybe(t.String),});
 const options = {
   fields: {
     title: {
@@ -13,9 +11,6 @@ const options = {
     abstract: {
       type: 'textarea'
     },
-    access: {
-      factory: t.form.Radio
-    }
   }
 };
 const Form = t.form.Form;
@@ -27,7 +22,6 @@ export default class General extends Component {
       defaultConfig: {
         title: this.props.title,
         abstract: this.props.abstract,
-        access:  this.props.access // "private" or "public"
       }
     }
   }

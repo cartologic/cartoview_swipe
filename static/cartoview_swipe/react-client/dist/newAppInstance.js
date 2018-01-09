@@ -21381,10 +21381,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Access = _tcombForm2.default.enums({
-  public: 'Public', private: 'Private (only me)'
-});
-var formConfig = _tcombForm2.default.struct({ title: _tcombForm2.default.String, abstract: _tcombForm2.default.maybe(_tcombForm2.default.String), access: Access });
+var formConfig = _tcombForm2.default.struct({ title: _tcombForm2.default.String, abstract: _tcombForm2.default.maybe(_tcombForm2.default.String) });
 var options = {
   fields: {
     title: {
@@ -21392,9 +21389,6 @@ var options = {
     },
     abstract: {
       type: 'textarea'
-    },
-    access: {
-      factory: _tcombForm2.default.form.Radio
     }
   }
 };
@@ -21411,8 +21405,7 @@ var General = function (_Component) {
     _this.state = {
       defaultConfig: {
         title: _this.props.title,
-        abstract: _this.props.abstract,
-        access: _this.props.access // "private" or "public"
+        abstract: _this.props.abstract
       }
     };
     return _this;
@@ -31396,12 +31389,12 @@ var newAppInstance = function (_React$Component) {
         props: {
           title: this.state.title,
           abstract: this.state.abstract,
-          access: this.state.access,
+
           onComplete: function onComplete(data) {
             _this4.setState({
               title: data.title,
-              abstract: data.abstract,
-              access: data.access
+              abstract: data.abstract
+
             });
           },
           stepForward: function stepForward() {

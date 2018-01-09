@@ -199,12 +199,10 @@ export default class editAppInstance extends React.Component {
         props: {
           title: this.state.title,
           abstract: this.state.abstract,
-          access: this.state.access,
           onComplete: (data) => {
             this.setState({
               title: data.title,
               abstract: data.abstract,
-              access: data.access,
             })
           },
           stepForward: () => {
