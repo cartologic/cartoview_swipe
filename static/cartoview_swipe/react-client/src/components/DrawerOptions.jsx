@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
 import t from 'tcomb-form';
 
+import '../css/drawerOptions.css'
+
 const UrlFrom = t.struct({
   urlRadio: t.enums({
     specificUrl: 'URL'
   }),
-  
 })
 const HomeButtonOptions = t.struct({
   viewHomeButton: t.Boolean,
@@ -38,7 +39,7 @@ export default class DrawerOptions extends Component {
           label: "Default Drawer Open",
         },
         homeButton: {
-          label: 'Home Button Options',
+          label: true,
           fields: {
             viewHomeButton: {
               label: "View Home Button",
@@ -49,9 +50,12 @@ export default class DrawerOptions extends Component {
               disabled: !defaultConfig.homeButton.viewHomeButton,
             },
             urlText: {
-              label: 'URL',
+              label: true,
               factory: t.form.Url,
-              disabled: !(defaultConfig.homeButton.viewHomeButton && defaultConfig.homeButton.redirectOptions === 'specificUrl')
+              disabled: !(defaultConfig.homeButton.viewHomeButton && defaultConfig.homeButton.redirectOptions === 'specificUrl'),
+              attrs: {
+                className: 'urlInput'
+              }
             }
           },
         },

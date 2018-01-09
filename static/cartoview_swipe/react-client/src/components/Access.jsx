@@ -111,7 +111,8 @@ export default class AppAccess extends React.Component {
     render() {
         return (
             <div>
-                <h3>{"Access Configuration"}</h3>
+                <h4>{"Access Configuration"}</h4>
+                <hr/>
                 <Form
                     ref={(form) => this.form = form}
                     value={this.state.value}
