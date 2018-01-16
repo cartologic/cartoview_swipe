@@ -10,7 +10,7 @@ import Animation from './components/helpers/AnimationHelper.jsx'
 
 import { default as LeftDrawer } from './components/Drawer/DrawerWithButton.jsx'
 import CartoviewSnackBar from './components/CartoviewSnakeBar.jsx'
-import CartoviewPopup from './components/PopUp.jsx'
+import CartoviewPopup from './components/popup.jsx'
 
 import ol from 'openlayers'
 
