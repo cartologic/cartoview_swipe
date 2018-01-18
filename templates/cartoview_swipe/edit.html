@@ -1,71 +1,64 @@
-{% extends "app_manager/app_install_base.html" %} 
-{% load bootstrap_tags staticfiles %} {% load i18n %}
+{% extends "app_manager/app_install_base.html" %}
+{% load bootstrap_tags staticfiles %}
+{% load i18n %}
 
-{% block title %} {{app_name}} {% endblock %}
-
-{% block head %} 
-{% include "geonode/ext_header.html" %} 
-{% include "geonode/app_header.html"%} 
-{{ block.super }} 
+{% block title %} {{ block.super }} - {% trans "Swipe" %} {% endblock %}
+{% block head %}
+    {% include "geonode/ext_header.html" %}
+    {% include "geonode/app_header.html" %}
+    {{ block.super }}
 {% endblock %}
-
-
-
 {% block body %}
-    <br>
-    <br>
-    <div id='reactjs-app'></div>
+    <div id="page-wrapper">
+        <div class="container-fluid">
+            <div id="root"></div>
+        </div>
+    </div>
 
-    <script type="text/javascript">
-        function getCookie(name) {
-          var cookieValue = null;
-          if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-              var cookie = cookies[i].trim();
-              // Does this cookie string begin with the name we want?
-              if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-              }
-            }
-          }
-          return cookieValue;
-        }
-        const CSRF_TOKEN = getCookie('csrftoken');
+{% endblock %}
+{% block extra_script %}
 
-        const site_url = "{{SITEURL}}"
+    <script src="{{ STATIC_URL }}cartoview_swipe/dist/commons.js"></script>
+    <script src="{{ STATIC_URL }}cartoview_swipe/dist/config.bundle.js"></script>
+    <script>
+        {% if instance %}
+        const urls={
+                    MapsAPI: "{% url 'api_dispatch_list' api_name='api' resource_name='maps' %}",
+                    keywordsAPI: "{% url 'api_dispatch_list' api_name='api' resource_name='keywords' %}",
+                    profilesAPI: "{% url 'api_dispatch_list' api_name='api' resource_name='profiles' %}",
+                    appInstance: "{% url 'api_dispatch_detail' api_name='api' resource_name='appinstances' pk=instance.id %}",
+                    proxy: "{{ PROXY_URL }}",
+                    geoserverUrl : "{{ GEOSERVER_BASE_URL }}",
+                    static: "{{ STATIC_URL }}",
+                    media: "{{ MEDIA_URL }}",
+                    rest: "{% url 'app_manager_base_url' %}rest/app_manager/",
+                    geonodeRest: "{% url 'api_api_top_level' 'api' %}",
+                    appLogo:'{% static 'cartoview_swipe/logo.png' %}',
+                    layerAttributes:"{% url 'app_manager_base_url' %}rest/app_manager/geonodelayerattribute/",
+                    mapLayers:"{% url "cartoview_map_layers" %}",
+                    newURL:"{% url "cartoview_swipe.new" %}",
+                    editURL:function(id){
+                    return "/apps/cartoview_swipe/"+id+"/edit/"
+                    },
+                    viewURL:function(id){
+                    return "/apps/cartoview_swipe/"+id+"/view/"
+                    },
+                    detailsURL:function(id){
+                    return "/apps/appinstance/"+id+"/"
+                    },
+                    describeFeatureType: function(typename){
+                    return "{{ GEOSERVER_BASE_URL }}wfs?service=wfs&version=2.0.0&request=DescribeFeatureType&typeName="+typename+"&outputFormat=application/json"
+                    }
         
-        const app_name = "{{app_name}}"
-
-        const app_instance_id = "{{instance.id}}"
-        const app_instance_title = "{{instance.title}}"
-        const app_instance_abstract = String(`{{instance.abstract}}`)
-        const app_instance_config = {{ instance.config|escape|safe }};
-
-        const URLS = {
-          geoserver: "{{ GEOSERVER_BASE_URL }}",
-          layersApiUrl: "/apps/{{app_name}}/api/layers/?",
-          searchByTitleApiUrl: "/apps/{{app_name}}/api/layers/?typename=",
-          profilesAPI: "{% url 'api_dispatch_list' api_name='api' resource_name='profiles' %}",
-          new: "/apps/{{app_name}}/new/",
-          edit: "/apps/{{app_name}}/" + app_instance_id + "/edit/"
-        };
-        
-        {% if request.user.is_authenticated %}
-        const user_logged_in = true
-        const username = '{{request.user}}'
-        {% else %}
-        const user_logged_in = false
-        const username = undefined
+                }
         {% endif %}
-      </script>
-
-    {% static "" as staticUrl %}
-    <script src='{{staticUrl}}{{app_name}}/react-client/dist/editAppInstance.js'></script>
-    <script type="text/javascript">
-        const props = {}
-        var app = React.createElement(editAppInstance, props);
-        ReactDOM.render(app, document.getElementById("reactjs-app"));
+            var username="{{instance.owner.username}}"
+            var viewer=new Viewer('root',username,urls);
+            viewer.view();
     </script>
+</div>
+</div>
+
+
+
 {% endblock %}
