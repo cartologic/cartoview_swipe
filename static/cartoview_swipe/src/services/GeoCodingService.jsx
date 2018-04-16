@@ -1,5 +1,7 @@
 import UrlAssembler from 'url-assembler'
-const nominatimURL = " http://nominatim.openstreetmap.org/search?"
+const nominatimURL = () => {
+    return window.location.protocol == "http:" ? " http://nominatim.openstreetmap.org/search?" : " https://nominatim.openstreetmap.org/search?"
+}
 class OSMGeoCoding {
     constructor() {
         this.OSMSettings = {
@@ -18,7 +20,7 @@ class OSMGeoCoding {
     }
     getURL = ( query ) => {
         const paramters = this.getPatamters( query )
-        return UrlAssembler( nominatimURL ).query( paramters ).toString()
+        return UrlAssembler( nominatimURL() ).query( paramters ).toString()
     }
     doGet = () => {
         return fetch( this.url, {
