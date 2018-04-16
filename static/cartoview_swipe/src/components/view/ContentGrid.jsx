@@ -16,6 +16,7 @@ import classnames from "classnames"
 import compose from 'recompose/compose'
 import { withStyles } from 'material-ui/styles'
 import withWidth from 'material-ui/utils/withWidth'
+import { ErrorModal } from './ErrorModal'
 const styles = theme => ( {
     root: {
         height: "100%"
@@ -115,6 +116,7 @@ class ContentGrid extends Component {
                     </Grid>
                 </Grid>
                 <CartoviewSnackBar open={childrenProps.featureIdentifyLoading} message={"Searching For Features at this Point"} />
+                <ErrorModal open={childrenProps.forbiddenMap} error={"Couldn't retrieve the map!"} onRequestClose={() => ""} />
             </div>
         )
     }
