@@ -71,12 +71,15 @@ class CartoviewDrawer extends React.Component {
                 <NavBar config={config} />
                 <Paper className={classes.drawerPaper} elevation={0}>
                     <List>
+                        {
+                        config.drawerOptions.homeButton.viewHomeButton && 
                         <ListItem onTouchTap={() => window.location.href = this.getRedirectURL()} button>
                             <ListItemIcon>
                                 <HomeIcon />
                             </ListItemIcon>
                             <ListItemText primary="Home" />
                         </ListItem>
+                        }
                         <ListItem onTouchTap={this.handleAboutChange} button>
                             <ListItemIcon>
                                 <InfoIcons />
