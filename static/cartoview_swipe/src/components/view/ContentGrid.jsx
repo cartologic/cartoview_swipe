@@ -26,7 +26,7 @@ const styles = theme => ( {
         height: "100%",
         zIndex: "1150",
         position: "fixed",
-        [ theme.breakpoints.down( 'md' ) ]: {
+        [ theme.breakpoints.down( 'sm' ) ]: {
             width: "90%"
         },
     },
