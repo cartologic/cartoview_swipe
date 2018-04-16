@@ -92,18 +92,27 @@ class CartoviewDrawer extends React.Component {
                             </ListItemIcon>
                             <ListItemText primary="Export Map" />
                         </ListItem>
-                        <CollapsibleListItem open={false} title="Layers" icon={<LayersIcons />} >
-                            <CartoviewLayerSwitcher handleLayerVisibilty={handleLayerVisibilty} changeLayerOrder={changeLayerOrder} mapLayers={mapLayers} />
-                        </CollapsibleListItem>
-                        <CollapsibleListItem open={false} title="Basemaps" icon={<LayersIcons />} >
-                            <CartoviewBasemapSwitcher 
-                                visibleBasemapName={visibleBasemapName} 
-                                handleLayerVisibilty={handleBasemapVisibilty} 
-                                mapLayers={basemapLayers} />
-                        </CollapsibleListItem>
-                        <CollapsibleListItem open={false} title="Legend" icon={<ImageIcon />} >
-                            <CartoviewLegends legends={legends} />
-                        </CollapsibleListItem>
+                        {
+                            config.showLayerSwitcher && 
+                            <CollapsibleListItem open={false} title="Layers" icon={<LayersIcons />} >
+                                <CartoviewLayerSwitcher handleLayerVisibilty={handleLayerVisibilty} changeLayerOrder={changeLayerOrder} mapLayers={mapLayers} />
+                            </CollapsibleListItem>
+                        }
+                       {
+                           config.showBaseMapSwitcher && 
+                            <CollapsibleListItem open={false} title="Basemaps" icon={<LayersIcons />} >
+                                <CartoviewBasemapSwitcher 
+                                    visibleBasemapName={visibleBasemapName} 
+                                    handleLayerVisibilty={handleBasemapVisibilty} 
+                                    mapLayers={basemapLayers} />
+                            </CollapsibleListItem>
+                       }
+                       {
+                           config.showLegend &&
+                            <CollapsibleListItem open={false} title="Legend" icon={<ImageIcon />} >
+                                <CartoviewLegends legends={legends} />
+                            </CollapsibleListItem>
+                       }
                         <CartoviewAbout open={about} title={config.formTitle} abstract={config.formAbstract} close={this.handleAboutChange} />
                     </List>
                 </Paper>
