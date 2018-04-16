@@ -124,3 +124,8 @@
 .map-card{
     margin: 0px !important;
 }
+
+.keywords-select {
+    max-width: 100%;
+    overflow-x: overlay; 
+}
