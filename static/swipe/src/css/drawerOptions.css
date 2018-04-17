@@ -1,0 +1,30 @@
+legend{
+  display: none;
+}
+
+.radio, .checkbox{
+  padding-left: 0 !important;
+}
+
+.form-group-homeButton-redirectOptions{
+  margin-left: 20px;
+}
+
+.form-group-homeButton-redirectOptions .control-label{
+  display: none;
+}
+
+.form-group-homeButton-urlText label{
+  display: none;
+}
+
+.urlInput{
+  margin-top: -12px;
+  margin-left: 20px;
+  width: 85%;
+}
+
+.form-group-homeButton-urlText span{
+  margin-left: 20px;
+  width: 85%;
+}

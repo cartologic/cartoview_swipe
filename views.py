@@ -39,6 +39,18 @@ class Swipe(StandardAppViews):
             initial['users'].update({'AnonymousUser': [
                 'view_resourcebase',
             ]})
+    
+    def new(self, request, template=None, context={}, *args, **kwargs):
+        return super(Swipe, self).new(request, template=None, context={'APP_NAME': APP_NAME}, *args, **kwargs)
+
+    def edit(self, request, instance_id,
+             template=None, context={}, * args, **kwargs):
+        return super(Swipe, self).edit(request, instance_id,
+                                       template=None, context={'APP_NAME': APP_NAME},
+                                       *args, **kwargs)
+
+    def view_app(self, request, instance_id, template=None, context={}):
+       return super(Swipe, self).view_app(request, instance_id, template=None, context={'APP_NAME': APP_NAME})
 
     def save(self, request, instance_id=None):
         user = request.user
