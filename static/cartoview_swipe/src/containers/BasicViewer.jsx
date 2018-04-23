@@ -118,10 +118,15 @@ class BasicViewerContainer extends Component {
     mapInit = () => {
         const { urls } = this.props
         let { map } = this.state
+        let that=this
         fetch( urls.mapJsonUrl, {
             method: "GET",
             credentials: 'include'
-        } ).then( ( response ) => response.json() ).then( ( config ) => {
+        } ).then( ( response ) => {
+            if(response.status == 403)
+                return Promise.reject('Forbidden')
+            return response.json()
+        } ).then( ( config ) => {
             MapConfigService.load( MapConfigTransformService.transform(
                 config ), map, urls.proxy )
             const mapLayers = map.getLayers().getArray()
@@ -131,6 +136,9 @@ class BasicViewerContainer extends Component {
             this.setBasemapSwitcherLayers( mapLayers )
             this.createLegends( LayersHelper.getLayers( mapLayers ) )
         } )
+        .catch(error => {
+            that.setState({forbiddenMap: true})
+        })
     }
     addSelectionLayer = () => {
         let { featureCollection, map } = this.state

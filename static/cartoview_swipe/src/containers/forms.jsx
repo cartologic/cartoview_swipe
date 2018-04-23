@@ -28,13 +28,28 @@ export const detailsConfigFormSchema = () => {
     })
     return formSchema
 }
+const limitedTitle = t.refinement( t.String, ( titleValue ) => {
+    let valid = true
+    if ( titleValue.length > 200 ) {
+      valid = false
+    }
+    return valid
+  } )
+
+  limitedTitle.getValidationErrorMessage = ( titleValue ) => {
+    if ( !titleValue ) {
+      return 'Required'
+    } else if ( titleValue.length > 200 ) {
+      return 'The title can not exceed the limit of 200 characters!'
+    }
+  }
 export const generalFormSchema = () => {
     const selectKeywordItem = t.struct({
         value: t.String,
         label: t.String
     })
     const formSchema = t.struct({
-        title: t.String,
+        title: limitedTitle,
         abstract: t.maybe(t.String),
         keywords: t.list(selectKeywordItem)
     })

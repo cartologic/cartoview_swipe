@@ -26,8 +26,8 @@ class BasicViewerHelper {
             layers: [ osmLayer ],
             view: new View( {
                 center: proj.fromLonLat( [ 0, 0 ] ),
-                minZoom: 4,
-                maxZoom: 16,
+                // minZoom: 4,
+                // maxZoom: 16,
                 zoom: 6
             } )
         } )

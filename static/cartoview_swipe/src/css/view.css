@@ -224,3 +224,35 @@
         width: calc(100% - 85px);
     }
 }
+
+
+.panel .widget.panel-body {
+    padding: 0;
+}
+
+.panel {
+    background-color: #FFF;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+    box-sizing: border-box;
+    border-radius: 0;
+    border: none;
+
+    padding: 20px;
+    text-align: center;
+}
+
+.panel-default>.panel-heading {
+    border: none;
+    background-color: transparent;
+    font-weight: 500;
+    font-size: 15px;
+    text-align: center;
+    color: red;
+}
+
+@media (min-width: 768px){
+    .modal-dialog {
+      width: 600px;
+      margin: 30px auto;
+    }
+}

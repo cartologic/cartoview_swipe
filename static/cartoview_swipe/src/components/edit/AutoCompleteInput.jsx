@@ -11,6 +11,7 @@ export const getKeywordsTemplate = ( options ) => {
             <label className={"control-label"}>{locals.label}</label>
             <AsyncCreatable
                 {...locals}
+                className = {'keywords-select'}
                 onChange={locals.onChange}
                 inputProps={locals.inputProps}
                 loadOptions={options.loadOptions}

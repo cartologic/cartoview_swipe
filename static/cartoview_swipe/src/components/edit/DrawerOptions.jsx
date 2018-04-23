@@ -1,31 +1,47 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import t from 'tcomb-form'
+import isUrl from 'is-url'
 import '../../css/drawerOptions.css'
+const customUrl = t.refinement(t.String, n => {
+  let valid = false
+  if(n.trim() == '' ) return valid
+  if (isUrl(n)) {
+    valid = true
+  }
+  return valid
+})
+customUrl.getValidationErrorMessage = ( value ) => {
+    if(!value) return 'Required!'
+    return "Invalid url!"
+}
 const UrlFrom = t.struct( {
     urlRadio: t.enums( {
         specificUrl: 'URL'
     } ),
 } )
-const HomeButtonOptions = t.struct( {
+const HomeButtonOptions = urlRequired => t.struct( {
     viewHomeButton: t.Boolean,
     redirectOptions: t.enums( {
         appHome: 'Go To App Home',
         portalHome: 'Go To Portal Home',
         specificUrl: 'URL'
     } ),
-    urlText: t.maybe(t.String)
+    urlText: urlRequired ? customUrl : t.maybe(customUrl)
 } )
-const formConfig = t.struct( {
-    defaultDrawerOpen: t.Boolean,
-    homeButton: HomeButtonOptions,
-} )
+const formConfig = (urlRequired) => {
+    return t.struct( {
+        defaultDrawerOpen: t.Boolean,
+        homeButton: HomeButtonOptions(urlRequired),
+    } )
+}
 const Form = t.form.Form
 export default class DrawerOptions extends Component {
     constructor( props ) {
         super( props )
         this.state = {
             defaultConfig: this.props.defaultDrawerOptions,
+            formConfig: formConfig(false)
         }
     }
     getComponentValue = () => {
@@ -57,7 +73,7 @@ export default class DrawerOptions extends Component {
                                 'specificUrl' ),
                             attrs: {
                                 className: 'urlInput'
-                            }
+                            },
                         }
                     },
                 },
@@ -68,7 +84,13 @@ export default class DrawerOptions extends Component {
     onChange( value ) {
         this.setState( { defaultConfig: value }, () => {
             // this.props.onComplete( this.state.defaultConfig )
+            if(this.state.defaultConfig.homeButton.viewHomeButton && this.state.defaultConfig.homeButton.redirectOptions === 'specificUrl'){
+                this.setState({formConfig: formConfig(true)})
+            }else{
+                this.setState({formConfig:formConfig(false)})
+            }
         } )
+
     }
     componentDidUpdate() {
         if ( this.props.error ) { this.refs.form.getValue() }
@@ -90,7 +112,7 @@ export default class DrawerOptions extends Component {
         <Form
           ref={form=>this.form = form}
           value={this.state.defaultConfig}
-          type={formConfig}
+          type={this.state.formConfig}
           options={()=>{return this.getFormOptions()}}
           onChange={this.onChange.bind(this)} />
       </div>
