@@ -102,7 +102,6 @@ class CartoviewDrawer extends React.Component {
                            config.showBaseMapSwitcher && 
                             <CollapsibleListItem open={false} title="Basemaps" icon={<LayersIcons />} >
                                 <CartoviewBasemapSwitcher 
-                                    visibleBasemapName={visibleBasemapName} 
                                     handleLayerVisibilty={handleBasemapVisibilty} 
                                     mapLayers={basemapLayers} />
                             </CollapsibleListItem>

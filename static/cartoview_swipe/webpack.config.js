@@ -67,7 +67,13 @@ const config = {
         ],
         noParse: [/dist\/ol\.js/, /dist\/jspdf.debug\.js/,
             /dist\/js\/tether\.js/]
-    }
+    },
+    // fix: webpack --watch exits after building once on linux
+    watchOptions: {
+        aggregateTimeout: 300,
+        poll: 1000,
+        ignored: /node_modules/
+      }
 }
 if (production) {
     const prodPlugins = [
