@@ -31,7 +31,7 @@
                     geonodeRest: "{% url 'api_api_top_level' 'api' %}",
                     appLogo:'{% static 'cartoview_swipe/logo.png' %}',
                     layerAttributes:"{% url 'app_manager_base_url' %}rest/app_manager/geonodelayerattribute/",
-                    mapLayers:"{% url "cartoview_map_layers" %}",
+                    mapLayers:"{% url 'api_dispatch_list' api_name='api' resource_name='maplayers' %}",
                     newURL:"{% url "cartoview_swipe.new" %}",
                     editURL:function(id){
                     return "/apps/cartoview_swipe/"+id+"/edit/"

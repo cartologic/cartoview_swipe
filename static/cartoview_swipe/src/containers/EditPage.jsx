@@ -1,15 +1,17 @@
 import 'Source/css/app.css'
 import 'react-select/dist/react-select.css'
+
 import { doGet, doPost } from 'Source/containers/utils'
+
 import AppAccess from 'Source/components/edit/Access'
 import AppConfiguration from 'Source/components/edit/AppConfiguration'
-import EditPageComponent from 'Source/components/edit/EditPage'
 import DrawerOptions from 'Source/components/edit/DrawerOptions'
-import SwipeStep from 'Source/components/edit/SwipeStep'
+import EditPageComponent from 'Source/components/edit/EditPage'
 import MapOptions from 'Source/components/edit/MapOptions'
 import MapSelector from 'Source/components/edit/MapSelector'
 import PropTypes from 'prop-types'
 import React from 'react'
+import SwipeStep from 'Source/components/edit/SwipeStep'
 import ToolConfiguration from 'Source/components/edit/ToolConfiguration'
 import URLS from 'Source/containers/URLS'
 const initialDefaultConfig = {
@@ -70,7 +72,7 @@ class EditPage extends React.Component {
         const { urls } = this.props
         const { selectedMap } = this.state
         let url = urls.mapLayers
-        url = this.urls.getParamterizedURL( url, { id: selectedMap.id } )
+        url = this.urls.getParamterizedURL( url, { map__id: selectedMap.id,local:true } )
         doGet( url ).then( result => {
             this.setState( {
                 mapLayers: result.objects,
