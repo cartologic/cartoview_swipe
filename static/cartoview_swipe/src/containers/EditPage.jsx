@@ -72,7 +72,7 @@ class EditPage extends React.Component {
         const { urls } = this.props
         const { selectedMap } = this.state
         let url = urls.mapLayers
-        url = this.urls.getParamterizedURL( url, { map__id: selectedMap.id,local:true } )
+        url = this.urls.getParamterizedURL( url, { map: selectedMap.id,fixed:false,} )
         doGet( url ).then( result => {
             this.setState( {
                 mapLayers: result.objects,

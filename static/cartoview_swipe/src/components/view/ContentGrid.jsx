@@ -72,6 +72,17 @@ function Transition( props ) {
     return <Slide direction="left" {...props} />
 }
 class ContentGrid extends Component {
+    constructor (props){
+        super(props)
+        this.state = {
+            forbiddenMap: false,
+        }
+    }
+    componentWillReceiveProps(nextProps){
+        if(this.props != nextProps){
+            this.setState({forbiddenMap: nextProps.childrenProps.forbiddenMap})
+        }
+    }
     componentDidMount() {
         const { childrenProps } = this.props
         childrenProps.map.setTarget( this.mapDiv )
@@ -116,7 +127,7 @@ class ContentGrid extends Component {
                     </Grid>
                 </Grid>
                 <CartoviewSnackBar open={childrenProps.featureIdentifyLoading} message={"Searching For Features at this Point"} />
-                <ErrorModal open={childrenProps.forbiddenMap} error={"Couldn't retrieve the map!"} onRequestClose={() => ""} />
+                <ErrorModal open={this.state.forbiddenMap} error={"Couldn't retrieve the map!"} onRequestClose={() => ""} />
             </div>
         )
     }

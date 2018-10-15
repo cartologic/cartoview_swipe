@@ -106,12 +106,11 @@ class BasicViewerContainer extends Component {
             let selectedLayerName = this.props.config.selectedLayer.value
             let layerToSwipe = {}
             mapLayers.filter( ( layer ) => {
-                if ( layer.values_ ) {
-                    if ( layer.values_.name === selectedLayerName ) {
-                        layerToSwipe = layer
-                    }
+                if ( layer.getProperties().name === selectedLayerName ) {
+                    layerToSwipe = layer
                 }
             } )
+            debugger
             return layerToSwipe
         }
     }
@@ -123,8 +122,9 @@ class BasicViewerContainer extends Component {
             method: "GET",
             credentials: 'include'
         } ).then( ( response ) => {
-            if(response.status == 403)
+            if(response.status == 403){
                 return Promise.reject('Forbidden')
+            }
             return response.json()
         } ).then( ( config ) => {
             MapConfigService.load( MapConfigTransformService.transform(
@@ -137,6 +137,7 @@ class BasicViewerContainer extends Component {
             this.createLegends( LayersHelper.getLayers( mapLayers ) )
         } )
         .catch(error => {
+            console.log(error)
             that.setState({forbiddenMap: true})
         })
     }
@@ -328,7 +329,8 @@ class BasicViewerContainer extends Component {
             handleBasemapVisibilty: this.handleBasemapVisibilty,
             zoomToLocation: this.zoomToLocation,
             exportMap: this.exportMap,
-            geocodeSearch: this.geocodeSearch
+            geocodeSearch: this.geocodeSearch,
+            forbiddenMap: this.state.forbiddenMap,
         }
         return <Swipe childrenProps={childrenProps} />
     }

@@ -58,8 +58,8 @@ export default class SwipeStep extends React.Component {
                 let mapLayers = nextProps.mapLayers
                 let options = mapLayers.map( ( layer ) => {
                     return ( {
-                        value: layer.typename,
-                        label: layer.title,
+                        value: layer.name,
+                        label: layer.name,
                         thumbnail_url: layer.thumbnail_url,
                     } )
                 } )
