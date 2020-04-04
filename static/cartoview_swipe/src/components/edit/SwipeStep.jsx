@@ -56,7 +56,7 @@ export default class SwipeStep extends React.Component {
         if ( this.props !== nextProps ) {
             if(nextProps.mapLayers !== this.state.mapLayers){
                 let mapLayers = nextProps.mapLayers
-                let options = mapLayers.map( ( layer ) => {
+                let options = mapLayers.filter(l=>l.group!=='background').map( ( layer ) => {
                     return ( {
                         value: layer.name,
                         label: layer.name,
