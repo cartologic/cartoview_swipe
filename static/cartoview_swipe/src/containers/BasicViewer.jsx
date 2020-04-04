@@ -136,7 +136,7 @@ class BasicViewerContainer extends Component {
             this.createLegends( LayersHelper.getLayers( mapLayers ) )
         } )
         .catch(error => {
-            console.log(error)
+            console.error(error)
             that.setState({forbiddenMap: true})
         })
     }
