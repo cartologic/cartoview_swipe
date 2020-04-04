@@ -110,7 +110,6 @@ class BasicViewerContainer extends Component {
                     layerToSwipe = layer
                 }
             } )
-            debugger
             return layerToSwipe
         }
     }
@@ -136,10 +135,10 @@ class BasicViewerContainer extends Component {
             this.setBasemapSwitcherLayers( mapLayers )
             this.createLegends( LayersHelper.getLayers( mapLayers ) )
         } )
-        .catch(error => {
-            console.log(error)
-            that.setState({forbiddenMap: true})
-        })
+        // .catch(error => {
+        //     console.log(error)
+        //     that.setState({forbiddenMap: true})
+        // })
     }
     addSelectionLayer = () => {
         let { featureCollection, map } = this.state

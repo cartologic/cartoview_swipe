@@ -261,6 +261,7 @@ class MapConfigService {
         }
         var view = map.getView(),
             proj = olProj.get(viewConfig.projection);
+        viewConfig.center = olProj.transform(viewConfig.center,"EPSG:4326",viewConfig.projection)
         if (proj && !olProj.equivalent(view.getProjection(), proj)) {
             map.setView(new View({
                 center: viewConfig.center,
